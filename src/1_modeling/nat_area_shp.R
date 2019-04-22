@@ -3,7 +3,7 @@
 # @return (dir): shapefile with native area
 
 
-# species <- species1
+#species <- species1
 
 nat_area_shp <- function(species) {
   #load packages
@@ -16,29 +16,37 @@ nat_area_shp <- function(species) {
   #load config
   config(dirs=T, premodeling=T)
   
+  
+  ##read in data
+  data <- read.csv(paste(occ_dir,"/raw/",species,".csv",sep=""),header=T)
+  
+  
   #load species list
-  splist <- unique(tkdist$Species) #alter column name
-  x <- subset(tkdist, tkdist$Species==species)  #alter column name
-  countries <- factor(as.character(unique(x$Native)))  #alter column name
+  # splist <- unique(data$Species) #alter column name
+  # x <- subset(data, data$Species==species)  #alter column name
+  countries <- factor(as.character(unique(data$country)))  #alter column name
   shp_NA3 <- subset(countries_sh, ISO %in% countries) ### DC added dissolve 
   
-
-  
-  # # # load in biome and Eco list 
-  bioEco <- read.csv(paste0( folder_EcoBio,"/", species, ".csv"))
   # # read in shp
   biomes <- readOGR(paste0(shpFolder,"/wwf_terr_ecos.shp"),verbose = FALSE)
+  
+  
+
+  ### process derived from 
+  ## https://gis.stackexchange.com/questions/231652/how-to-select-polygons-by-points-in-r
+  ###
+  # read in points, convert to SP points object, define CRS 
+  xy_data <- data
+  coordinates(xy_data) = ~ longitude + latitude
+  crs(xy_data) = crs(biomes)
+  # run a extract to values and select all data that 
+  polys.sub <- biomes[!is.na(sp::over(biomes, sp::geometry(xy_data))), ] 
+  
   # # 
-  # # # subset the feature based on the biome and ecoregion 
-  # shp_Bio <- subset(biomes, BIOME %in% bioEco$BIOME)
-  shp_Eco <- subset(biomes, ECO_ID %in% bioEco$ECO_ID)
+  # # # subset the feature based on the ecoregion 
+  shp_Eco <- subset(biomes, ECO_ID %in% polys.sub$ECO_ID)
   # # 
 
-  
-    # Clip feature to native area countries 
-  # shp_Clip <-gIntersection(shp_Bio, shp_NA3)
-  # shp_NA4 <- SpatialPolygonsDataFrame(shp_Clip, data.frame(ID=1:length(shp_Clip)))
-  # 
   shp_Clip2 <-gIntersection(shp_Eco, shp_NA3)
   shp_NA5 <- SpatialPolygonsDataFrame(shp_Clip2, data.frame(ID=1:length(shp_Clip2)))
   # 

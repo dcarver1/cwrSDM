@@ -14,7 +14,7 @@
 
 config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeling=F) {
   #version
-  run_version <<- "testing20190412"
+  run_version <<- "daucus20190417"
 
   #load packages
   require(raster)

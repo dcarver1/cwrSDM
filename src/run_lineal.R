@@ -68,23 +68,25 @@ setwd(root)
 
 # running on local machine at the moment 
 server.number = "1"
-server.species = read.csv(paste0(root ,"/parameters/WEP/cucurbitas_CWR.csv"), header = TRUE) 
+server.species = read.csv(paste0(root ,"/parameters/WEP/daucus_CWR.csv"), header = TRUE) 
 
 ##########################################   End Set Parameters  ###############################################
 
-### test a single species
-# species <- as.character(server.species$V1[2])
+### view all potential species 
+# print(server.species)
 
-### test two species 
-server.species2 <- slice(server.species, 9 )
-species1 <- "Cucurbita_okeechobeensis_subsp._okeechobeensis"
+### test selected species 
+server.species2 <- slice(server.species, 12 )
+species1 <- "Cucurbita_pepo_subsp._fraterna"
+
+#run process for a selected species. 
+result_master = lapply(server.species2, master_run)
 ##########################################   Start Process    ###############################################
 
 # Run function in parallel for all species
 result_master = lapply(server.species$taxonkey, master_run)
 
-#run process for a single species. 
-#result_master = lapply(server.species2, master_run)
+
 
 
 

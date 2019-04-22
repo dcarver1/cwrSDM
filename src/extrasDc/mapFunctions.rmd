@@ -1,0 +1,208 @@
+---
+title: Summary of maxent modeling results and conservation gap analysis results per taxon 
+author: Daniel Carver
+output:
+  html_document:
+    code_folding: hide
+    highlight: tango
+    theme: yeti
+    toc: yes
+    toc_depth: 2
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#install.packages("jpeg")
+#install.packages("tiff")
+library(knitr)
+library(markdown)
+library(rmarkdown)
+library("tmap")
+library("raster")
+library("DT")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# function for flitering list based on character values 
+include <- function (theList, toMatch){
+  matches <- unique (grep(paste(toMatch,collapse="|"), 
+                          theList, value=TRUE))
+  return(matches)
+}
+# taxa <- "Cucurbita_pepo_subsp._ovifera_var._ozarkana"
+# run<- "endVersion20190416"
+```
+
+## Summary of the models for `r taxa` with a native area boundary of `r run`. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# taxa is the 
+baseDir <- paste0(base_dr, '/', taxa,'/',run)
+csv <- list.files(baseDir, pattern = ".csv", recursive = TRUE , full.names = TRUE)
+
+```
+
+### Evaluation metrics 
+
+The modeling process was run with 10 replicates to attempt to account for random variation occuring in this type of process. The table below shows the statistical results for the 10 runs. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+# evalMetric <- include(csvs,"eval_metrics_rep.csv")
+DT::datatable(read.csv(include(csv,"eval_metrics_rep.csv")))
+}
+```
+
+The median result across the 10 replicates is shown below. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+# evalMetric <- include(csvs,"eval_metrics_rep.csv")
+DT::datatable(read.csv(include(csv,"eval_metrics.csv")))
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+
+tif <- list.files(path = baseDir, pattern = '.tif', recursive = TRUE, full.names = TRUE)
+
+median <- raster(include(tif, "spdist_median"))
+thrshold <- raster(include(tif, "spdist_thrsld"))
+sd <- raster(include(tif, "spdist_sd"))
+tmap_mode("view")
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+#Create output directory 
+# newDir <- paste0(baseDir,"/jpegs")
+# dir.create(newDir)
+# 
+# #loop through tif and convert them to jpg 
+# newDir
+# i = tif1
+# 
+# library("jpeg")
+# library("tiff")
+# for(i in tif){
+#   name <- file_path_sans_ext(basename(i))
+#   img <- readTIFF(i)
+#   writeJPEG(img, target = paste0(newDir, "/",name,".jpeg"), quality = 1)
+# }
+# 
+# jpeg <- list.files(path = newDir, pattern = '.jpeg', recursive = TRUE, full.names = TRUE)
+# medianJP <- include(jpeg, "spdist_median")
+# thrsholdJP <- include(jpeg, "spdist_thrsld")
+# sdJP <- include(jpeg, "spdist_sd")
+}
+```
+
+### Maps of model outputs. 
+
+
+
+Map of the median result from maxent models
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+plot(median)
+qtm(shp = median)
+}
+```
+
+Map of the standard devation result from maxent models
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+plot(sd)
+qtm(shp = sd)
+}
+```
+
+Map of the threshold (binary presence-absence) result from maxent models
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+  plot(thrshold)
+qtm(shp = thrshold)
+}
+```
+
+
+### Conservation gap analysis 
+
+The table below shows the ex situ conservation summary. SRS is a gross comparison of germplasm (G) and reference (H) records. GRS analyzes how comprehensively the G records cover the maxent model spatially. ERS analyzes how well the G records cover the maxent model with regard to ecosystems covered  
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# exSummary <- include(csv, "exsitu/summary.csv")
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+DT::datatable(read.csv(include(csv, "exsitu/summary.csv")))
+}
+```
+
+
+The table below show the in situ conservation summary.  GRS analyzes how comprehensively protected areas (WDPA database) cover the maxent model spatially. ERS analyzes how well protected areas cover the maxent model with regard to ecosystems covered   
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# inSummary <- include(csv, "insitu/summary.csv")
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+DT::datatable(read.csv(include(csv, "insitu/summary.csv")))
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# inSummary <- include(csv, "insitu/summary.csv")
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+DT::datatable(read.csv(include(csv, "combined/fcs_combined.csv")))
+}
+```
+
+### Gaps in Distribution 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+gapRaster <- raster(include(tif, "grs_pa_PAs_narea_areakm2"))
+
+gapRaster0 <- gapRaster[is.na(gapRaster[])] <- 0 
+
+collectionGap <- thrshold * gapRaster0
+collgap1 <- (thrshold * gapRaster) + thrshold
+} 
+```
+
+Map of the potential distribution with 50 km buffer area in which G samples have been collected. 
+Areas of Native Range = 0 
+Potential Distribution = 1
+Area Where samples have been collected = 2 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+if(length(include(csv,"eval_metrics_rep.csv")) == 0){
+  print("Models were not are to be ran on this species due to insufficent number of samples")
+}else{
+  plot(collgap1)
+qtm(shp = collgap1)
+}
+```

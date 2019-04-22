@@ -14,24 +14,28 @@ library(rmarkdown)
 # this is a function that will pull in output tif from different folders and generate a set of maps with evaluation statistics 
 # base_dr <-"C:/Users/danie/Desktop/aichiTest/aichiTest/gap_analysis/endVersion!19_2_1"
 
-#trying something new 
+# define species 
+speciesType <-"Daucus"
+
+#define base directory 
 base_dr <- "C:/Users/danie/Desktop/aichiTest/aichiTest/gap_analysis"
 
 #create a new director 
-dir.create(paste0(base_dr,"/","endProcess", Sys.Date()))
+dir.create(paste0(base_dr,"/","endProcessDaucus", Sys.Date()))
 
 #Define new director as a variable 
-outputDir <- paste0(base_dr,"/","endProcess", Sys.Date())
+outputDir <- paste0(base_dr,"/","endProcessDaucus", Sys.Date())
 
 #Define the name of the run your interested in. 
-runFolder <- "testing20190412"
+runFolder <- "daucus20190417"
 
 #list all species being modeled
-species <- list.dirs(path = base_dr,full.names = FALSE, recursive = FALSE)
-species2 <- species[13:16]
+all <- list.dirs(path = base_dr,full.names = FALSE, recursive = FALSE) 
+species <- grep(speciesType, all, value = TRUE)
+  
 # for each species in the data create a report
 # these reports are saved in output_dir with the name specified by output_file
-for (taxa in species[1:16]){
+for (taxa in species){
   runtype <- list.dirs(path = paste0(base_dr,"/", taxa),full.names = FALSE, recursive = FALSE)
   #rmarkdown::render("C:/Users/danie/Desktop/aichi13/extrasDC/summaryRunResults.rmd",  # file 2
    #                 output_file =  paste("report_", taxa, '_a' , Sys.Date(), ".html", sep=''), 

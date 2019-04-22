@@ -54,6 +54,11 @@ spModeling <- function(species){
     #load occurrence points
     xy_data <- read.csv(paste(occ_dir,"/no_sea/",species,".csv",sep=""),header=T)
     
+    if(nrow(xy_data < 10)){
+      replicates <- "replicates=3"
+    }else{
+      replicates <- "replicates=10"
+    }
     ###
     # ok lots of weirdness here. Not sure what this dataframe is expected to look like coming in. 
     # good questions for down south
@@ -82,7 +87,7 @@ spModeling <- function(species){
     
     
     ### DC Reduced this from 10 to 3 to test if the Fraterna model would run or not... I don't think this is a defencable action but it's happening. 
-    if(nrow(xy_data) >= 3){
+    if(nrow(xy_data) >= 4){
       if(!file.exists(paste0(crossValDir, "/modeling_results.", species, ".RDS"))){
         cat("Starting modeling process for species:", species, "\n")
         
@@ -218,7 +223,7 @@ spModeling <- function(species){
         
         
         
-        library(randomForest)
+                library(randomForest)
                 library(VSURF)
                 #
                 presenceAbsence <- as.factor(c(rep(0,nrow(bck_data_bio)),rep(1,nrow(xy_data_bio))))
@@ -280,6 +285,7 @@ spModeling <- function(species){
 
                 xy_mxe <- xy_mxe[,varNames]
 
+                
         # Fitting final model
                 cat("Performing MaxEnt modeling  for: ", species, "\n")
                         tryCatch(expr = {
@@ -291,7 +297,7 @@ spModeling <- function(species){
                                                #a = bck_data[,c("lon","lat")], # Pseudo-absences
                                                removeDuplicates = T,
                                                # args = c("nowarnings","replicates=5","linear=true","quadratic=true","product=true","threshold=true","hinge=true","pictures=false","plots=false"),
-                                               args = c("nowarnings","replicates=10","pictures=false","plots=false", CreateMXArgs(optPars)),
+                                               args = c("nowarnings",replicates,"pictures=false","plots=false", CreateMXArgs(optPars)),
                                                #path = crossValDir,
                                                silent = F)
 

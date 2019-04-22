@@ -3,6 +3,8 @@
 # @param (string) species: species ID
 # @return (data.frame): This function returns a data frame with SRS, and numbers
 #                       of G, H, and total samples, with and without coordinates.
+
+#species <- species1
 srs_exsitu <- function(species) {
   #load config
   config(dirs=T,exsitu=T)
@@ -14,7 +16,7 @@ srs_exsitu <- function(species) {
   #load counts file
   ### DC changing sp_dir so it looks at the original raw datasets to inculde 
   ### Herbarium collection that may not have spatial data
-  rawData12 <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/extras/Cucurbita_total_2018_9_27_addition23values_cleanedGBIF.csv")
+  # rawData12 <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/extras/Cucurbita_total_2018_9_27_addition23values_cleanedGBIF.csv")
   counts <- read.csv(paste(sp_dir,"/counts.csv",sep=""))
   
   #define number of H and G collections 
