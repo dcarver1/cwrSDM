@@ -1,7 +1,6 @@
 require(PresenceAbsence);require(raster);require(dismo);library(tidyverse)
 
-#speciesecies=2653304
-
+#species <- species1
 metrics_function<-function(species){
   #########
   crossValDir <- paste0(gap_dir, "/", species, "/", run_version, "/modeling/maxent")
@@ -12,7 +11,7 @@ metrics_function<-function(species){
   bg<-as.data.frame(maxn$bck_predictions[complete.cases(maxn$bck_predictions),])
   
   ### DC changed conditional statement form number of occurance from 5 to 2
-  if(ncol(occ)>=5 &  nrow(occ)>2 & ncol(bg)>=5 &  nrow(bg)>5){
+  if(ncol(occ)>=2 &  nrow(occ)>2 & ncol(bg)>=2 &  nrow(bg)>2){
     occ$observed<-NA;occ$observed<-rep(1,nrow(occ))
     bg$observed<-NA;bg$observed<-rep(0,nrow(bg))
   

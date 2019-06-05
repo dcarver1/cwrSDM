@@ -27,68 +27,68 @@ master_run <- function(species) {
     #load config function
     #source(paste(repo_dir,"/config.R",sep=""))
 
-    t1a <- Sys.time()
+  
+ t1a <- Sys.time()
     #create directories
     #source(paste(repo_dir,"/tools/create_sp_dirs.R",sep=""))
     cat("...creating directories\n")
     spp_dirs <- create_sp_dirs(species)
     final_function = "0.create_sp_dirs was done"
-    #calculate time 
+    #calculate time
     time_df <- rbind(time_df, data.frame(functionUsed="create_sp_dir",  runTime=difftime(Sys.time(), t1a, units='secs')))
-    
-    
+
+
     t1a <- Sys.time()
     #step 2.1-clean sea
     #source(paste(repo_dir,"/0_cleaning/clean_sea.R",sep=""))
     cat("...cleaning species\n")
     spp_clean <- clean_sea(species)
     final_function = "1.clean_sea was done"
-    
-    #calculate time 
+
+    #calculate time
     time_df <- rbind(time_df, data.frame(functionUsed="clean_sea", runTime=difftime(Sys.time(), t1a, units='secs')))
-    
+
     t1a <- Sys.time()
     #step 2.1.1-sampling ocurrences
     spp_samp <- sampling(species)
     final_function = "1.1.sampling ocurrences was done"
-    #calculate time 
+    #calculate time
     time_df <- rbind(time_df, data.frame(functionUsed="sampling", runTime=difftime(Sys.time(), t1a, units='secs')))
-    
-    
+
+
     t1a <- Sys.time()
     #step 2.2-create native area
     #source(paste(repo_dir,"/1_modeling/nat_area_shp.R",sep=""))
     cat("...creating native area shapefile\n")
     narea_shp <- nat_area_shp(species)
     final_function = "2.nat_area_sh was done"
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="nat_area_shp", runTime=difftime(Sys.time(), t1a, units='secs')))
-  
+
     t1a <- Sys.time()
     #step 2.3-crop bioclim
     #source(paste(repo_dir,"/1_modeling/nat_area_mask.R",sep=""))
     cat("...masking bioclim layers to native area\n")
     crop_bio <- nat_area_mask(species)
     final_function = "2.1.nat_area_mask was done"
-    #### Issue here is that the script is looking for species file based on the numerical id not the name. 
-    #calculate time 
+    #### Issue here is that the script is looking for species file based on the numerical id not the name.
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="nat_area_mask", runTime=difftime(Sys.time(), t1a, units='secs')))
-    
+
     t1a <- Sys.time()
     #step 3-modeling (#only calibration)
     #source(paste(repo_dir,"/1_modeling/1_1_maxent/modeling_approach.R",sep=""))
     #source(paste(repo_dir,"/1_modeling/1_1_maxent/create_mx_args.R",sep=""))
     #source(paste(repo_dir,"/1_modeling/1_1_maxent/do_projections.R",sep=""))
     #source(paste(repo_dir,"/1_modeling/1_1_maxent/evaluating.R",sep=""))
-    #source(paste(repo_dir,"/1_modeling/1_1_maxent/nullModelAUC.R",sep=""))
-    #source(paste(repo_dir,"/1_modeling/1_2_alternatives/create_buffers.R",sep=""))
-    cat("...maxent modelling\n")
-    spmod <- spModeling(species)
-    final_function = "3.spModeling was done"
-    #calculate time 
-    time_df<- rbind(time_df, data.frame(functionUsed="sModeling", runTime=difftime(Sys.time(), t1a, units='secs')))
+    #source(paste(rep o_dir,"/1_modeling/1_1_maxent/nullModelAUC.R",sep=""))
+      #source(paste(repo_dir,"/1_modeling/1_2_alternatives/create_buffers.R",sep=""))
+      cat("...maxent modelling\n")
+      spmod <- spModeling(species)
+      final_function = "3.spModeling was done"
+      #calculate time
+      time_df<- rbind(time_df, data.frame(functionUsed="sModeling", runTime=difftime(Sys.time(), t1a, units='secs')))
 
-  
     t1a <- Sys.time()
     #step 4.1-exsitu gap analysis
     #source(paste(repo_dir,"/2_gap_analysis/exsitu/srs.R",sep=""))

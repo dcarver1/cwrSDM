@@ -68,16 +68,17 @@ setwd(root)
 
 # running on local machine at the moment 
 server.number = "1"
-server.species = read.csv(paste0(root ,"/parameters/WEP/daucus_CWR.csv"), header = TRUE) 
+server.species = read.csv(paste0(root ,"/parameters/WEP/cucurbitas_CWR.csv"), header = TRUE) 
 
 ##########################################   End Set Parameters  ###############################################
 
 ### view all potential species 
 # print(server.species)
 
-### test selected species 
-server.species2 <- slice(server.species, 12 )
+### test selected species
+server.species2 <- slice(server.species,12)
 species1 <- "Cucurbita_pepo_subsp._fraterna"
+ssCut <- server.species[12:16,]
 
 #run process for a selected species. 
 result_master = lapply(server.species2, master_run)

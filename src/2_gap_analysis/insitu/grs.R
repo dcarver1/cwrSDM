@@ -49,13 +49,13 @@
 #                       It has three columns, the first has the species code; the second has the status
 #                       of process, if value is "TRUE" the process finished correctly, if the result is FALSE
 #                       the process had a error; the third column has a description about the process
-#species="4182513"
+#species=species1
 calculate_grs = function(species, debug=F) {
   #required packages
   require(rgdal)
   
   #source config
-  config(dirs=T, insitu=T)
+  config(dirs=T, insitu=T, Country=F)
   
   # Defined vars about process
   message = "Ok"
@@ -131,7 +131,10 @@ calculate_grs = function(species, debug=F) {
       # Calculate areas for the species distribution and intersect
       # overlay.area <- length(a) * res
       # species.area <- length(b) * res
-      
+      if(Country==TRUE){
+        overlay.intersect <- mask(overlay.intersect,countryMask)
+        overlay.species.area <- mask(overlay.species.area, countryMask)
+      }
       overlay.area = sum(overlay.intersect[],na.rm=T) #area within PAs
       species.area = sum(overlay.species.area[], na.rm=T) #total sp dist. area
       

@@ -13,7 +13,7 @@ grs_exsitu <- function(species, debug=F) {
   require(raster)
   
   #load config
-  config(dirs=T,exsitu=T)
+  config(dirs=T,exsitu=T, Country=F)
   
   #directory for species
   sp_dir <- paste(gap_dir,"/",species,"/",run_version,sep="")
@@ -22,10 +22,10 @@ grs_exsitu <- function(species, debug=F) {
   sp_counts <- read.csv(paste(gap_dir,"/",species,"/counts.csv",sep=""))
   
   #run only for spp with occ file
-  if (file.exists(paste(occ_dir,"/no_sea/",species,".csv",sep="")) & sp_counts$totalGUseful != 0) {
+  if (file.exists(paste(occ_dir,"/raw/",species,".csv",sep="")) & sp_counts$totalGUseful != 0) {
     
     #load occurrence points
-    occ_data <- read.csv(paste(occ_dir,"/no_sea/",species,".csv",sep=""),header=T)
+    occ_data <- read.csv(paste(occ_dir,"/raw/",species,".csv",sep=""),header=T)
     
     #load native area shapefile
     msk <- raster(paste(sp_dir,"/bioclim/narea_mask.tif",sep=""))
@@ -39,7 +39,7 @@ grs_exsitu <- function(species, debug=F) {
     #}
     
     #select G samples and validate if G >= 1
-    occ_g <- unique(occ_data[which(occ_data$type == "G"),c("lon","lat")])
+    occ_g <- unique(occ_data[which(occ_data$type == "G"),c("longitude","latitude")])
     if (nrow(occ_g) >= 1) {
       
       if (!file.exists(paste(sp_dir,"/gap_analysis/exsitu/ca50_g_narea_pa.tif",sep=""))) {
@@ -55,10 +55,14 @@ grs_exsitu <- function(species, debug=F) {
         g_buffer <- raster(paste(sp_dir,"/gap_analysis/exsitu/ca50_g_narea_pa.tif",sep=""))
       }
       
+      if(Country==TRUE){
+        global_area <- mask(global_area,countryMask)
+      }
+      
       #calculate area of presence/absence (note area in km2)
       pa_area <- crop(global_area, pa_spp)
       pa_area <- pa_spp * pa_area
-      if (debug & !file.exists(paste(sp_dir,"/gap_analysis/exsitu/grs_pa_narea_areakm2.tif",sep=""))) {
+      if (!file.exists(paste(sp_dir,"/gap_analysis/exsitu/grs_pa_narea_areakm2.tif",sep=""))) {
         pa_area <- writeRaster(pa_area, paste(sp_dir,"/gap_analysis/exsitu/grs_pa_narea_areakm2.tif",sep=""), format="GTiff")
       }
       pa_area <- sum(pa_area[], na.rm=T) #in km2
@@ -66,19 +70,14 @@ grs_exsitu <- function(species, debug=F) {
       #calculate area of g_buffer
       gbuf_area <- crop(global_area, g_buffer)
       gbuf_area <- g_buffer * gbuf_area
-      if (debug & !file.exists(paste(sp_dir,"/gap_analysis/exsitu/grs_gbuffer_narea_areakm2.tif",sep=""))) {
+      if (!file.exists(paste(sp_dir,"/gap_analysis/exsitu/grs_gbuffer_narea_areakm2.tif",sep=""))) {
         gbuf_area <- writeRaster(gbuf_area, paste(sp_dir,"/gap_analysis/exsitu/grs_gbuffer_narea_areakm2.tif",sep=""), format="GTiff")
       }
       gbuf_area <- sum(gbuf_area[], na.rm=T) #in km2
       
       #calculate GRS
       grs <- min(c(100, gbuf_area/pa_area*100))
-    } else {
-      gbuf_area <- 0
-      grs <- 0
-      pa_area <- NA
-    }
-    
+
     
   } else {
     
@@ -95,7 +94,7 @@ grs_exsitu <- function(species, debug=F) {
   #return object
   return(out_df)
 }
-
+}
 # testing the function
 # base_dir <- "~/nfs"
 # source("~/Repositories/aichi13/src/config.R")

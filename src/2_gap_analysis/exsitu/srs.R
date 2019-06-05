@@ -7,7 +7,7 @@
 #species <- species1
 srs_exsitu <- function(species) {
   #load config
-  config(dirs=T,exsitu=T)
+  config(dirs=T,exsitu=T,Country=F)
   library(dplyr)
   
   #directory for species
@@ -18,7 +18,7 @@ srs_exsitu <- function(species) {
   ### Herbarium collection that may not have spatial data
   # rawData12 <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/extras/Cucurbita_total_2018_9_27_addition23values_cleanedGBIF.csv")
   counts <- read.csv(paste(sp_dir,"/counts.csv",sep=""))
-  
+
   #define number of H and G collections 
   # numberG_H <- rawData12 %>%
   #   filter(as.character(Taxon_final) == species)%>%
@@ -33,8 +33,51 @@ srs_exsitu <- function(species) {
   # 
   
   #calculate SRS
+  #### building out method for creating counts from subset data 
+  if(Country == TRUE){
+  occ_data <- read.csv(paste(occ_dir,"/raw/",species,".csv",sep=""),header=T)
+  occ_data <- sp::SpatialPointsDataFrame(occ_data[,c("longitude", "latitude")], data = occ_data) #width=0.000556
+  crs(countryMask) <- crs(occ_data)
+  countryOnly <- raster::crop(occ_data, countryMask)
   
-  if (counts$totalHRecords ==0) {
+  #Recreate the count feature for this process. 
+  colNames <- c("totalRecords",	"totalUseful", 	"totalGRecords",	"totalGUseful",
+                
+                "totalHRecords",	"totalHUseful",	"totalPost1950",	"totalPre1950",
+                
+                "totalNoDate",	"GBIF",	"GENE")
+  
+  
+  tbl <- countryOnly@data %>%
+    mutate(hasLatLong = !is.na(latitude) | !is.na(longitude))%>%
+    dplyr::group_by(type, hasLatLong) %>%
+    dplyr::summarize(total = n())
+  
+  df <- data.frame(matrix(NA, nrow = 1, ncol = 11))
+  
+  colnames(df) <- colNames
+  
+  df$totalRecords <- sum(tbl$total)
+  
+  df$totalUseful <- sum((subset(tbl, hasLatLong == TRUE))$total)
+  
+  df$totalGRecords <- sum((subset(tbl, type == "G"))$total)
+  
+  df$totalGUseful <- sum((subset(tbl, type == "G" & hasLatLong == TRUE))$total)
+  
+  df$totalHRecords <- sum((subset(tbl, type == "H"))$total)
+  
+  df$totalHUseful <- sum((subset(tbl, type == "H" & hasLatLong == TRUE))$total)
+  
+  counts <- df
+  
+  }
+  if(counts$totalGRecords >= 1 & counts$totalHRecords == 0){
+    srs <-100
+  }
+  
+  #### this works for full distributions
+  if (counts$totalGRecords == 0 & counts$totalHRecords ==0) {
     srs <- 0
   } else {
     srs <- min(c(100,counts$totalGRecords/counts$totalHRecords*100))

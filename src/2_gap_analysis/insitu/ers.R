@@ -53,14 +53,14 @@
 #                       of process, if value is "TRUE" the process finished correctly, if the result is "FALSE"
 #                       the process had a error; the third column has a description about process
 
-#species="4182513"
+#species= species1
 #calculate_ers(species)
 calculate_ers = function(species, debug=F){
   #required packages
   require(rgdal)
   
   #source config
-  config(dirs=T, insitu=T)
+  config(dirs=T, insitu=T, Country = F)
   
   # Defined vars about process
   message = "Ok"
@@ -101,7 +101,7 @@ calculate_ers = function(species, debug=F){
       # Remove differents values from raster to get only the native area
       #species.mask[which(!is.na(species.mask[]))]<-1
       species.mask <- raster(paste(species.dir,"bioclim/narea_mask.tif",sep=""))
-      
+
       #print("Loaded the native area of the species (mask)")
       
       # Intersect between species distribution and mask
@@ -118,6 +118,10 @@ calculate_ers = function(species, debug=F){
       # Intersect between overlay eco specie  and protected areas
       origin(pa.raster) <- origin(overlay.eco)
       overlay.eco.pa = pa.raster * overlay.eco
+      if(Country==TRUE){
+        overlay.eco <- mask(overlay.eco,countryMask)
+        overlay.eco.pa <- mask(overlay.eco.pa, countryMask)
+      }
       
       #print("Intersected the overlapping (species distribution and ecosystems) and global protected areas")
       

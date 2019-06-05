@@ -6,6 +6,7 @@
 #Jonatan Soto
 #Based on Jeison & Alejandra advice
 #-------------------------------------
+#species <- species1
 clean_sea <- function(species) {
   
   #load packages
@@ -20,10 +21,12 @@ clean_sea <- function(species) {
   if (file.exists(paste0(folderin_raw,"/",species,".csv"))) {
     #load raw species occurrences
     spp <- read.csv(paste0(folderin_raw,"/",species,".csv"), header = TRUE) ##read file
-    colnames(spp) <- c("index" ,"lon", "lat", "country", "type", "native")
+    colnames(spp) <- c("index", "taxon" ,"lon", "lat", "country", "type")
     #cat("loading species ID=", species, "file", "\n")
     
+    
     #transform spp data.frame into SpatialPointsDataFrame
+    spp <-  spp[complete.cases(spp), ]
     coordinates(spp) <- ~lon+lat ###to SpatialPointsDataFrame
     crs(spp) <- crs(countries_sh) ####add to mask
     over_spp <- over(spp, countries_sh) ### over() #overlay

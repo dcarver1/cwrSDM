@@ -7,13 +7,13 @@
 # @return (data.frame): This function returns a data frame with ERS, # eco classes 
 #                       of G buffer (i.e. CA50) and of the presence/absence surface.
 
-#species="2650747"
-ers_exsitu <- function(species, debug=F) {
+#species <- species1
+ers_exsitu <- function(species, debug=F, Country=F) {
   #packages
   require(raster)
   
   #load config
-  config(dirs=T,exsitu=T)
+  config(dirs=T,exsitu=T,Country=F)
   
   #directory for species
   sp_dir <- paste(gap_dir,"/",species,"/",run_version,sep="")
@@ -22,9 +22,9 @@ ers_exsitu <- function(species, debug=F) {
   sp_counts <- read.csv(paste(gap_dir,"/",species,"/counts.csv",sep=""))
   
   #run only for spp with occ file
-  if (file.exists(paste(occ_dir,"/no_sea/",species,".csv",sep="")) & sp_counts$totalGUseful != 0) {
+  if (file.exists(paste(occ_dir,"/raw/",species,".csv",sep="")) & sp_counts$totalGUseful != 0) {
     #load occurrence points
-    occ_data <- read.csv(paste(occ_dir,"/no_sea/",species,".csv",sep=""),header=T)
+    occ_data <- read.csv(paste(occ_dir,"/raw/",species,".csv",sep=""),header=T)
     
     #load native area shapefile
     msk <- raster(paste(sp_dir,"/bioclim/narea_mask.tif",sep=""))
@@ -39,8 +39,13 @@ ers_exsitu <- function(species, debug=F) {
     #}
     pa_spp[which(pa_spp[] == 0)] <- NA
     
+    if(Country==TRUE){
+      pa_spp <- mask(pa_spp,countryMask)
+    }
+    
+    
     #select G samples and validate if G >= 1
-    occ_g <- unique(occ_data[which(occ_data$type == "G"),c("lon","lat")])
+    occ_g <- unique(occ_data[which(occ_data$type == "G"),c("longitude","latitude")])
     if (nrow(occ_g) >= 1) {
       if (!file.exists(paste(sp_dir,"/gap_analysis/exsitu/ca50_g_narea_pa.tif",sep=""))) {
         #generate G buffers within native area
@@ -59,7 +64,7 @@ ers_exsitu <- function(species, debug=F) {
       pa_nclass <- crop(eco.raster, pa_spp)
       origin(pa_nclass)<-origin(pa_spp)
       pa_nclass <- pa_spp * pa_nclass
-      if (debug & !file.exists(paste(sp_dir,"/gap_analysis/exsitu/ers_pa_narea_ecosystems.tif",sep=""))) {
+      if (!file.exists(paste(sp_dir,"/gap_analysis/exsitu/ers_pa_narea_ecosystems.tif",sep=""))) {
         pa_nclass <- writeRaster(pa_nclass, paste(sp_dir,"/gap_analysis/exsitu/ers_pa_narea_ecosystems.tif",sep=""), format="GTiff")
       }
       pa_nclass <- length(unique(na.omit(pa_nclass[])))
@@ -68,9 +73,13 @@ ers_exsitu <- function(species, debug=F) {
       g_buffer[which(g_buffer[] == 0)] <- NA
       gbuf_nclass <- crop(eco.raster, g_buffer)
       origin(gbuf_nclass)<-origin(g_buffer)
+      if(Country==TRUE){
+        g_buffer <- mask(g_buffer,countryMask)
+      }
       gbuf_nclass <- g_buffer * gbuf_nclass
       gbuf_nclass[which(gbuf_nclass[]==0)]<-NA
-      if (debug & !file.exists(paste(sp_dir,"/gap_analysis/exsitu/ers_gbuffer_narea_ecosystems.tif",sep=""))) {
+
+      if (!file.exists(paste(sp_dir,"/gap_analysis/exsitu/ers_gbuffer_narea_ecosystems.tif",sep=""))) {
         gbuf_nclass <- writeRaster(gbuf_nclass, paste(sp_dir,"/gap_analysis/exsitu/ers_gbuffer_narea_ecosystems.tif",sep=""), format="GTiff")
       }
       
@@ -79,12 +88,7 @@ ers_exsitu <- function(species, debug=F) {
      
       #calculate ERS
       ers <- min(c(100, (gbuf_nclass/pa_nclass)*100))
-    } else {
-      ers <- 0
-      gbuf_nclass <- 0
-      pa_nclass <- NA
-    }
-    
+  
     
   } else {
     ers <- 0
@@ -98,6 +102,7 @@ ers_exsitu <- function(species, debug=F) {
   
   #return object
   return(out_df)
+  }
 }
 
 #testing the function

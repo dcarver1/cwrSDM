@@ -12,10 +12,14 @@
 
 #NOTE: base_dir will have to be specified in the master code
 
-config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeling=F) {
+config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeling=F, Country=F) {
   #version
-  run_version <<- "daucus20190417"
-
+  run_version <<- "cucurbita20190531"
+  Country <<- FALSE
+  #countryOfInterset <<- "TUN"  #needs to be ISO3
+  #folder1 <<- "C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/gadm/shapefile"
+  #countryMask <<- readOGR(paste0(folder1, "/gadm28ISO.shp"),verbose = FALSE) %>%
+  #  subset(ISO %in% countryOfInterset)
   #load packages
   require(raster)
 
@@ -78,6 +82,15 @@ config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeli
 
   ####################################### 2. GAP ANALYSIS ################################################
 
+  ######## Clip to Country #######
+  #used by functions: exsitu(grs.R, ers.R) insitu(ers.R , grs.R)
+  if (Country) {
+    countryOfInterset <- "TUN"  #needs to be ISO3
+    folder1 <- "C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/gadm/shapefile"
+    countryMask <- readOGR(paste0(folder1, "/gadm28ISO.shp"),verbose = FALSE) %>%
+      subset(ISO %in% countryOfInterset)
+  }
+  
   ######## EX SITU #######
   #used by functions: CropMask.R, buffer_points.R, grs.R, ers.R
   if (exsitu) {

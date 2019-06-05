@@ -34,7 +34,7 @@ source(paste(repo_dir,"/config.R",sep=""))
 #base_dir="//dapadfs"
 
 # 
-# species <- species1
+#species <- species1
 
 spModeling <- function(species){
   # run config function
@@ -54,7 +54,7 @@ spModeling <- function(species){
     #load occurrence points
     xy_data <- read.csv(paste(occ_dir,"/no_sea/",species,".csv",sep=""),header=T)
     
-    if(nrow(xy_data < 10)){
+    if(nrow(xy_data) < 10){
       replicates <- "replicates=3"
     }else{
       replicates <- "replicates=10"
@@ -297,7 +297,7 @@ spModeling <- function(species){
                                                #a = bck_data[,c("lon","lat")], # Pseudo-absences
                                                removeDuplicates = T,
                                                # args = c("nowarnings","replicates=5","linear=true","quadratic=true","product=true","threshold=true","hinge=true","pictures=false","plots=false"),
-                                               args = c("nowarnings",replicates,"pictures=false","plots=false", CreateMXArgs(optPars)),
+                                               args = c("nowarnings","replicates=10","pictures=false","plots=false", CreateMXArgs(optPars)),
                                                #path = crossValDir,
                                                silent = F)
 

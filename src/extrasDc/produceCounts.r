@@ -9,61 +9,43 @@
 ### 
 
 library(dplyr)
+## use this clause to produce a counts CSV based only on a single area. 
+Country <-FALSE
+iso3 <- "TUN"
 
-data <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/extras/Cucurbita_total_2018_9_27_addition23values_cleanedGBIF.csv")
+data <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/Cucurbita/Cucurbita_CWR_2019_5_29.csv")
+dim(data)
 
+names(data)
 dataThin <- data %>%
   dplyr::select(c("Taxon_final", "latitude", "longitude", "type",  "country")) %>%
   mutate(hasLatLong = !is.na(latitude) | !is.na(longitude))
+dim(dataThin)
 
 
+if(Country == TRUE){
+  dataThin <- dataThin %>%
+    filter(country == iso3)
+}
+dim(dataThin)
 #List of existing cwr species 
+#CWR <- unique(data$Taxon_final)
 
-CWR <- c("Cucurbita_argyrosperma_subsp._sororia",
+#option is using uncleaned dataset 
+speciesOfInterest <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/Cucurbita/edited_0429_forModeling.csv") 
+CWR <- unique(speciesOfInterest$Taxon_final)
 
-         "Cucurbita_cordata",
-
-         "Cucurbita_digitata", 
-
-         "Cucurbita_ecuadorensis",
-
-         "Cucurbita_foetidissima",
-
-         "Cucurbita_lundelliana",
-
-         "Cucurbita_maxima_subsp._andreana",
-
-         "Cucurbita_okeechobeensis_subsp._martinezii",
-
-         "Cucurbita_okeechobeensis_subsp._okeechobeensis",
-
-         "Cucurbita_palmata",
-
-         "Cucurbita_pedatifolia",
-
-         "Cucurbita_pepo_subsp._fraterna",
-
-         "Cucurbita_pepo_subsp._ovifera_var._ozarkana", 
-
-         "Cucurbita_pepo_subsp._ovifera_var._texana",
-
-         "Cucurbita_radicans",
-
-         "Cucurbita_xscabridifolia")
 
 
 
 #generate a conut of all the species. 
 
 counts <- dataThin %>% 
-
   group_by(Taxon_final, type) %>%
-
   dplyr::summarise(total = n()) %>%
-
   arrange(desc(total))
 
-
+View(counts)
 
 # this should be changed 
 
@@ -108,10 +90,9 @@ for(i in CWR){
   df$totalHUseful <- sum((subset(tbl, type == "H" & hasLatLong == TRUE))$total)
 
   dir.create(paste0(local2,"/",as.character(i)), showWarnings = FALSE)
-
-  write.table(df, file = paste0(local2,"/",as.character(i),"/counts.csv"),
-
-            sep='\t')
+  rownames(df) <- NULL
+  write.csv(df, file = paste0(local2,"/",as.character(i),"/counts.csv"))
+  print(paste0(i , " with " ,dim(df)))
     } 
 
 

@@ -19,7 +19,7 @@ nat_area_shp <- function(species) {
   
   ##read in data
   data <- read.csv(paste(occ_dir,"/raw/",species,".csv",sep=""),header=T)
-  
+  data <- data[complete.cases(data),]
   
   #load species list
   # splist <- unique(data$Species) #alter column name
