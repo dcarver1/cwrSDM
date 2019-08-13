@@ -14,7 +14,7 @@
 
 config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeling=F, Country=F) {
   #version
-  run_version <<- "cucurbita20190531"
+  run_version <<- "nameOfTheversion"
   Country <<- FALSE
   #countryOfInterset <<- "TUN"  #needs to be ISO3
   #folder1 <<- "C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/gadm/shapefile"
@@ -31,7 +31,7 @@ config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeli
     occ_dir <<- paste0(par_dir,"/occurrences");if(!file.exists(occ_dir)){dir.create(occ_dir)}
   }
 
-  
+
   ####################################### 0.CLEANING ################################################
   # used by functions: clean_sea.R  and split_occs_srs.R #####
   if (cleaning) {
@@ -40,18 +40,18 @@ config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeli
 
     ##COUNTRIES SHAPEFILES##
     #countries_sh <<- countries_sh
-    
-    ##Biomes Shapefile 
+
+    ##Biomes Shapefile
     shpFolder <<- paste0(par_dir, "/ecosystems/shp")
-    
-    ##ELU raster 
+
+    ##ELU raster
     eluFolder <<- paste0(par_dir, "/ecosystems/raster")
 
     ##OUTPUT FOLDER IN clean_sea FUNCTION, AND INPUT IN split_occs_srs FUNCTION##
     folder_nosea <<- paste0(occ_dir,"/","no_sea")
     if(!file.exists(folder_nosea)){dir.create(folder_nosea)}
-    
-    #output folder for ecoregion CSV 
+
+    #output folder for ecoregion CSV
     folder_EcoBio <<- paste0(occ_dir,"/","ecoBio")
     if (!file.exists(paste(folder_EcoBio,sep=""))) {dir.create(paste(folder_EcoBio, sep=""),recursive=T)}
   }
@@ -66,7 +66,7 @@ config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeli
     countries_sh <<- countries_sh
     layer_name <<- "gadm28ISO"
 
-    tkdist <<- read.table(paste0(par_dir,"/WEP/cucurbitas_CWR_taxonKey.txt"), header=T)
+    tkdist <<- read.table(paste0(par_dir,"/WEP/ + listOfSpeciesNames.txt"), header=T)
     global_mask <<- raster(paste0(par_dir,"/world_mask/raster/mask.tif"))
   }
 
@@ -86,11 +86,11 @@ config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeli
   #used by functions: exsitu(grs.R, ers.R) insitu(ers.R , grs.R)
   if (Country) {
     countryOfInterset <- "TUN"  #needs to be ISO3
-    folder1 <- "C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/gadm/shapefile"
+    folder1 <- "base_dir + /parameters/gadm/shapefile"
     countryMask <- readOGR(paste0(folder1, "/gadm28ISO.shp"),verbose = FALSE) %>%
       subset(ISO %in% countryOfInterset)
   }
-  
+
   ######## EX SITU #######
   #used by functions: CropMask.R, buffer_points.R, grs.R, ers.R
   if (exsitu) {

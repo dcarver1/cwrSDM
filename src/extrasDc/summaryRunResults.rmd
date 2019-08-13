@@ -1,6 +1,6 @@
 ---
-title: Summary of Cucurbita Habitat Modeling 
-author: Daniel Carver. Colin Khoury 
+title: Summary of Cucurbita Habitat Modeling
+author: Daniel Carver. Colin Khoury
 output:
   html_document:
     code_folding: hide
@@ -27,16 +27,16 @@ library("DT")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# function for flitering list based on character values 
+# function for flitering list based on character values
 include <- function (theList, toMatch){
-  matches <- unique (grep(paste(toMatch,collapse="|"), 
+  matches <- unique (grep(paste(toMatch,collapse="|"),
                           theList, value=TRUE))
   return(matches)
 }
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# taxa is the 
+# taxa is the
 ###DC
 baseDir <- paste0(base_dr, '/', taxa)
 csv <- list.files(baseDir, pattern = ".csv", recursive = TRUE , full.names = TRUE)
@@ -46,7 +46,7 @@ html <- list.files(baseDir, pattern = ".html", recursive = TRUE , full.names = T
 
 ### Summary Statistics for Model Runs for `r taxa`
 
-This table show the statistical results of all median models. 
+This table show the statistical results of all median models.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 dfSum <- data.frame()
@@ -84,10 +84,10 @@ ras1 <- rasters[maxRas]
 ras1 <- ras1[[1]]
 rastersThin <- rasters[-c(maxRas)]
 
-ras1[is.na(ras1[])] <- 0 
+ras1[is.na(ras1[])] <- 0
 
 
-#build the first raster here 
+#build the first raster here
 if(length(thres) > 0 ){
   for(i in 1:length(rastersThin))
     {
@@ -95,7 +95,7 @@ if(length(thres) > 0 ){
     if(any(rast2))
       {
       ras <- raster(thres[i])
-      ras[is.na(ras[])] <- 0 
+      ras[is.na(ras[])] <- 0
       ras <- extend(ras, extent(ras1), value = 0)
       ras1 <- ras1 + ras
       }else
@@ -107,7 +107,7 @@ if(length(thres) > 0 ){
   ras1 <- NA
 }
 
-ras1[ras1[] <= 0] <- NA 
+ras1[ras1[] <= 0] <- NA
 
 
 
@@ -119,12 +119,12 @@ if(class(ras1) == "RasterLayer"){
   print("no rasters are present")
 }
 ```
-This map above is composed of `r length(rasters)` model results. 
+This map above is composed of `r length(rasters)` model results.
 
 
-### EcoRegion all Variables and the two EcoRegion Varible Select Maps 
+### EcoRegion all Variables and the two EcoRegion Varible Select Maps
 
-The map below shows the combination map of our three ecoregion models. 
+The map below shows the combination map of our three ecoregion models.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -144,13 +144,13 @@ for(class in rasters){
 }
 
 
-# 
+#
 # ecoFull <- extend(eco1, extent(bio1), value = 0)
 # ecoFullv <- extend(ecoV, extent(bio1), value = 0)
 
-ecoRast[is.na(ecoRast[])] <- 0 
-rfUtilRast[is.na(rfUtilRast[])] <- 0 
-vsurfRast[is.na(vsurfRast[])] <- 0 
+ecoRast[is.na(ecoRast[])] <- 0
+rfUtilRast[is.na(rfUtilRast[])] <- 0
+vsurfRast[is.na(vsurfRast[])] <- 0
 allRasters <- ecoRast + rfUtilRast + vsurfRast
 
 
@@ -163,8 +163,8 @@ if(class(allRasters) == "RasterLayer"){
 
 
 
-### EcoRegion 
-The map below is an example of the prediction map that is limited to ecoregions in which known presense locations are found. 
+### EcoRegion
+The map below is an example of the prediction map that is limited to ecoregions in which known presense locations are found.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(class(ecoRast) == "RasterLayer"){
   qtm(shp = ecoRast)
@@ -178,7 +178,7 @@ if(class(ecoRast) == "RasterLayer"){
 
 
 ### EcoRegion RFuntilities Variable Seleciton  
-The map below is an example of the prediction map that is limited to ecoregions in which known presense locations are found. The rfutilities varible selection process and removal of correlated variabls was perform before the model was ran. 
+The map below is an example of the prediction map that is limited to ecoregions in which known presense locations are found. The rfutilities varible selection process and removal of correlated variabls was perform before the model was ran.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(class(rfUtilRast) == "RasterLayer"){
@@ -191,7 +191,7 @@ if(class(rfUtilRast) == "RasterLayer"){
 
 
 ### EcoRegion RFuntilities Variable Seleciton  
-The map below is an example of the prediction map that is limited to ecoregions in which known presense locations are found. The Vsurf threshold varible selection process and removal of correlated variabls was perform before the model was ran. 
+The map below is an example of the prediction map that is limited to ecoregions in which known presense locations are found. The Vsurf threshold varible selection process and removal of correlated variabls was perform before the model was ran.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(class(vsurfRast) == "RasterLayer"){
   qtm(shp = vsurfRast)
@@ -203,12 +203,12 @@ if(class(vsurfRast) == "RasterLayer"){
 
 
 
-## content below is not really relivent, just easy to keep then remove. 
+## content below is not really relivent, just easy to keep then remove.
 
 
 
-### Biome 
-The map below is an example of the prediction map that is limited to biomes in which known presense locations are found. 
+### Biome
+The map below is an example of the prediction map that is limited to biomes in which known presense locations are found.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 for(class in rasters){
@@ -230,7 +230,7 @@ if(class(biome) == "RasterLayer"){
 
 ### Country
 
-The map below is an example of the prediction map that is limited to the countries in which known presense locations are found. 
+The map below is an example of the prediction map that is limited to the countries in which known presense locations are found.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 for(class in rasters){
   country <- grepl("count", metrics, fixed = TRUE)
@@ -250,9 +250,9 @@ if(class(country) == "RasterLayer"){
 ```
 
 
-### World 
+### World
 
-The map below is an example of the prediction map that is based on background points generated from around the world. The model is constained to the countries in which the species is native. 
+The map below is an example of the prediction map that is based on background points generated from around the world. The model is constained to the countries in which the species is native.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 for(class in rasters){

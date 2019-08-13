@@ -27,19 +27,19 @@ library(plsdepot)
 nipals_by_specie = lapply(1:length(occ_list), function(x){
    y<-as.data.frame(occ_list[[x]])
    cat("processing NIPALS for ", as.character(unique(y$Taxon))," | ",x,"\n")
-   
-   
+
+
    x2<-lapply(1:ncol(unique(y[,4:ncol(y)])),function(x){
      y_temp<-unique(y[,4:ncol(y)])
      x2<-length(unique(y_temp[,x]))
      return(x2)
    })
-   
-   
-   
+
+
+
    if(nrow(y)>4 & nrow(unique(y[,4:ncol(y)]))>5 & any(x2)>3){
      cat("processing NIPALS for ", as.character(unique(y$Taxon))," | ",x,"\n")
-     
+
    z = nipals(Data=y[,4:ncol(y)], comps=5, scaled=T)
   vars1 = z$cor.xt[,1] > 0.7 | z$cor.xt[,1] < -0.7
   vars2 = z$cor.xt[,2] > 0.7 | z$cor.xt[,2] < -0.7
@@ -48,15 +48,15 @@ nipals_by_specie = lapply(1:length(occ_list), function(x){
   return(vars)
 }else if(nrow(unique(y[,4:ncol(y)]))<5  | any(x2)==1) {
   cat("ommiting NIPALS for ", as.character(unique(y$Taxon))," | ",x," LESS THAN 5 UNIQUE VALUES","\n")
-  
+
   vars = colnames(y[,4:ncol(y)])
   return(vars)
 }else{
   cat("ommiting NIPALS for ", as.character(unique(y$Taxon))," | ",x,"\n")
-  
+
   vars = colnames(y[,4:ncol(y)])
-  
-  
+
+
 }
   })
 names(nipals_by_specie) = names(occ_list)
@@ -66,9 +66,9 @@ lapply(nipals_by_specie, length)
 
 # Explore correlation level
 nipals_vif_results = mapply(x=occ_list, y=nipals_by_specie, FUN=function(x,y)
-{ 
+{
   print(as.character(unique(x$Taxon)))
-  
+
   z=as.data.frame(x[,paste(y)])
   if(nrow(z)<10){
     vif_res<-y

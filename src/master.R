@@ -2,32 +2,32 @@
 # @param (chr) species: species ID
 # @return (dir): status of run
 
-base_dir <- "C:/Users/danie/Desktop/aichiTest/aichiTest"
-repo_dir <- "C:/Users/danie/Desktop/aichiTest/aichiTest/src"
+base_dir <- "enterPath"
+repo_dir <- "base_dir + /src"
 
 #here for troubleshooting. 
 #species <- species1
 
 master_run <- function(species) {
-  # build a datframe that captures the total run time for a process.  
+  # build a datframe that captures the total run time for a process.
   time_df <- data.frame(matrix(ncol = 2, nrow = 0))
   x <- c("functionUsed", "runTime")
   colnames(time_df) <- x
-  
+
   startTime <- Sys.time()
-  
+
     #error message
   message = "OK"
   status = TRUE
   final_function= character()
-  speciecs <- as.character(species)  
+  speciecs <- as.character(species)
   tryCatch({
     print(paste0("Start ",species))
 
     #load config function
     #source(paste(repo_dir,"/config.R",sep=""))
 
-  
+
  t1a <- Sys.time()
     #create directories
     #source(paste(repo_dir,"/tools/create_sp_dirs.R",sep=""))
@@ -94,29 +94,29 @@ master_run <- function(species) {
     #source(paste(repo_dir,"/2_gap_analysis/exsitu/srs.R",sep=""))
     cat("...exsitu srs\n")
     srs_ex <- srs_exsitu(species)
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="srs_ex", runTime=difftime(Sys.time(), t1a, units='secs')))
-  
+
     t1a <- Sys.time()
     #source(paste(repo_dir,"/2_gap_analysis/exsitu/grs.R",sep=""))
     cat("...exsitu grs\n")
     grs_ex <- grs_exsitu(species)
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="grs_ex", runTime=difftime(Sys.time(), t1a, units='secs')))
-  
+
     t1a <- Sys.time()
     #source(paste(repo_dir,"/2_gap_analysis/exsitu/ers.R",sep=""))
     cat("...exsitu ers\n")
     ers_ex <- ers_exsitu(species)
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="ers_ex", runTime=difftime(Sys.time(), t1a, units='secs')))
-  
+
     t1a <- Sys.time()
     #source(paste(repo_dir,"/2_gap_analysis/exsitu/fcs.R",sep=""))
     cat("...exsitu fcs\n")
     fcs_ex <- fcs_exsitu(species)
     final_function = "4. fcs_exsitu was calculated"
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="fcs_ex", runTime=difftime(Sys.time(), t1a, units='secs')))
 
     t1a <- Sys.time()
@@ -124,42 +124,42 @@ master_run <- function(species) {
     #source(paste(repo_dir,"/2_gap_analysis/insitu/grs.R",sep=""))
     cat("...insitu grs\n")
     grs_in <- calculate_grs(species)
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="grs_in", runTime=difftime(Sys.time(), t1a, units='secs')))
-  
+
     t1a <- Sys.time()
     #source(paste(repo_dir,"/2_gap_analysis/insitu/ers.R",sep=""))
     cat("...insitu ers\n")
     ers_in <- calculate_ers(species)
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="ers_in", runTime=difftime(Sys.time(), t1a, units='secs')))
-  
+
     t1a <- Sys.time()
     #source(paste(repo_dir,"/2_gap_analysis/insitu/fcs.R",sep=""))
     cat("...insitu fcs\n")
     fcs_in <- calculate_fcs(species)
     final_function = "5. fcs_in was calculated"
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="fcs_in", runTime=difftime(Sys.time(), t1a, units='secs')))
 
-  
+
     t1a <- Sys.time()
     #step 4.3-combine insitu and exsitu
     #source(paste(repo_dir,"/2_gap_analysis/combined/fcs_combine.R",sep=""))
     cat("...combine exsitu and insitu fcs\n")
     fcs_comb <- fcs_combine(species)
     final_function = "6. fcs combined was calculated"
-    #calculate time 
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="fcs_comb", runTime=difftime(Sys.time(), t1a, units='secs')))
 
- 
-    #calculate time 
+
+    #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="totalTime", runTime=difftime(Sys.time(), startTime, units='secs')))
-  
-    time_df$minutes <- time_df$runTime / 60 
+
+    time_df$minutes <- time_df$runTime / 60
     sp_dir <- paste(gap_dir,"/",species,"/",run_version,sep="")
     write.csv(time_df, paste0(sp_dir, "/runTimes.csv"))
-    
+
     #return status data.frame
   #  return (data.frame(species = species, status = status, message = message))
   },error = function(e) {

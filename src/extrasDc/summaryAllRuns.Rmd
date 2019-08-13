@@ -1,5 +1,5 @@
 ---
-title: Summary of maxent modeling results and conservation gap analysis results per taxon 
+title: Summary of maxent modeling results and conservation gap analysis results per taxon
 author: Colin Khoury, Daniel Carver
 output:
   html_document:
@@ -25,9 +25,9 @@ library("DT")
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# function for flitering list based on character values 
+# function for flitering list based on character values
 include <- function (theList, toMatch){
-  matches <- unique (grep(paste(toMatch,collapse="|"), 
+  matches <- unique (grep(paste(toMatch,collapse="|"),
                           theList, value=TRUE))
   return(matches)
 }
@@ -35,15 +35,15 @@ include <- function (theList, toMatch){
 ```
 
 
-## Species Richness Map 
-This map combines all threshold maps for individual species. 
+## Species Richness Map
+This map combines all threshold maps for individual species.
 
 
 ```{r  echo=FALSE, message=FALSE, warning=FALSE}
 n= 1
 speciesList <- species
 vector <- c("feature")
-  ### need to put is a clause incase 
+  ### need to put is a clause incase
 for(i in speciesList){
 tif <- list.files(path = paste0(base_dr,"/",i,"/",runFolder,"/"), pattern = '.tif', recursive = TRUE, full.names = TRUE)
 thres <- include(tif, "spdist_thrsld")
@@ -67,31 +67,31 @@ extend_all =function(rasters){
  extent(Reduce(extend,rasters))
 }
 
-sum_all = 
+sum_all =
 function(rasters, extent){
  re = lapply(rasters, function(r){extend(r, extent, value=0)})
  Reduce("+",re)
-} 
+}
 r_sum = sum_all(rasterList, extend_all(rasterList))
 tmap_mode("view")
-#Replace all zeros with NA 
+#Replace all zeros with NA
 r_sum[r_sum == 0]<-NA
 qtm(r_sum)
 raster::writeRaster(x = r_sum, filename = paste0(outputDir , '/speciesRichness'), format = "GTiff",overwrite=TRUE)
 
-### insitu conservation map. 
+### insitu conservation map.
 # protectAreas <- raster("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/protected_areas/raster/wdpa_reclass.tif")
-# 
+#
 # unique(values(protectAreas))
-# #flipping these values so when I mutple by r_sum raster areas within protected areas appear as zero. 
+# #flipping these values so when I mutple by r_sum raster areas within protected areas appear as zero.
 # protectAreas[protectAreas == 1]<- 0
-# 
+#
 # protectAreas[is.na(protectAreas)]<- 1
-# # multiply reduces all the values within protected area to 0 
+# # multiply reduces all the values within protected area to 0
 # paOut <- protectAreas * r_sum
 # paOutTunisia <- mask(paOut, country)
 # #qtm(paOutTunisia)
-# 
+#
 # raster::writeRaster(x = paOutTunisia, filename = paste0(outputDir, "/insituGapAreas"), format = "GTiff", overwrite=TRUE)
 
 ```
@@ -113,41 +113,41 @@ qtm(tunisia)
 <br>
 <br>
 
-## Summary of Conservation Statistics for all Species 
+## Summary of Conservation Statistics for all Species
 
 The SRS conservation statistic is based on all known occurance records for the species (Total_records). The other conservation metrics are based on the expert evaluated dataset that was used in the modeling process (Records_Used_in_Model).   
 
 
 ```{r  echo=FALSE, message=FALSE, warning=FALSE}
 
-modelingData <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/Cucurbita/allSpecies_new2019_5_9_allrecords_cleaned.csv")
+modelingData <- read.csv("path to location of modeling data")
 # species <- speciesList[1]
 
 species_summary <- function(species){
 
   count_dir <- paste0(base_dr,"/",species)
   gap_dir <- paste0(base_dr,"/",species,"/",runFolder,"/gap_analysis")
-  
+
   numberUsedInModel <- modelingData %>%
     filter(Taxon_final == species)%>%
     nrow()
-  
+
   colsNames <- c( "Scientific_Name", "Total_records",
                             "Total_with_coords", "Total_G", "Total_G_with_coords", "Total_H", "Total_H_with_coords",
                     "Total_records_Tunisia","Total_with_coords_Tunisia", "Total_G_Tunisia",
   "Total_G_with_coords_Tunisia","Total_H_Tunisia", "Total_H_with_coords_Tunisia",
 "SRS", "GRS_ex", "ERS_ex", "FCS_ex", "GRS_in", "ERS_in", "FCS_in", "FCSc_min",
                             "FCSc_max", "FCSc_mean", "Priority_category")
-  
+
   summ_table <- as.data.frame(matrix(ncol = length(colsNames), nrow = 1))
   colnames(summ_table) <- colsNames
-  
+
   ### if country specific add theses
   # "Total_records_Tunisia","Total_with_coords_Tunisia", "Total_G_Tunisia",
   # "Total_G_with_coords_Tunisia","Total_H_Tunisia", "Total_H_with_coords_Tunisia",
 
   summ_table$Scientific_Name <- as.character(species)
-  
+
   if(file.exists(paste0(count_dir, "/counts.csv"))){
     counts <- read.csv(paste0(count_dir, "/counts.csv"), header = TRUE)
     summ_table$Total_records <- counts$totalRecords
@@ -191,8 +191,8 @@ species_summary <- function(species){
   # }else if (pri2$VALID[which(pri2$Species==species)]==FALSE){
   #   summ_table$Model_type <- "CA50"
   # }
-  
-  
+
+
   if(file.exists(paste0(gap_dir,"/exsitu/summary.csv"))){
     exsitu <- read.csv(paste0(gap_dir,"/exsitu/summary.csv"), header = TRUE)
     summ_table$SRS <- round(exsitu$SRS, 2)
@@ -200,32 +200,32 @@ species_summary <- function(species){
     summ_table$ERS_ex <- round(exsitu$ERS, 2)
     summ_table$FCS_ex <- round(exsitu$FCS, 2)
   }
-  
+
   if(file.exists(paste0(gap_dir,"/insitu/summary.csv"))){
     insitu <- read.csv(paste0(gap_dir,"/insitu/summary.csv"), header = TRUE)
     summ_table$GRS_in <- round(insitu$GRS, 2)
     summ_table$ERS_in <- round(insitu$ERS, 2)
     summ_table$FCS_in <- round(insitu$FCS, 2)
-  } 
-    
-  
-  
+  }
+
+
+
   if(file.exists(paste0(gap_dir,"/combined/fcs_combined.csv"))){
     combined <- read.csv(paste0(gap_dir,"/combined/fcs_combined.csv"), header = TRUE)
     summ_table$FCSc_min <- round(combined$FCSc_min, 2)
     summ_table$FCSc_max <- round(combined$FCSc_max, 2)
     summ_table$FCSc_mean <- round(combined$FCSc_mean, 2)
     summ_table$Priority_category <- as.character(combined$FCSc_mean_class)
-  } 
-    
+  }
+
   return(summ_table)
-  
+
 }
 
 species_table<-lapply(1:length(speciesList), function(i){
   pt<-species_summary(speciesList[i])
   return(pt)
-  
+
 })
 
 species_table <- do.call(rbind, species_table)
@@ -241,14 +241,14 @@ DT::datatable(species_table, options = list(pageLength = 25))
 <br>
 
 
-## Median Model Runs 
-Evaluation statistics for the median model run for species that enough occurence points to be modeled. 
+## Median Model Runs
+Evaluation statistics for the median model run for species that enough occurence points to be modeled.
 
 ```{r  echo=FALSE, message=FALSE, warning=FALSE}
 n= 1
 speciesList <- species
 vector <- c("feature")
-  ### need to put is a clause incase 
+  ### need to put is a clause incase
 for(i in speciesList){
 csv <- list.files(path = paste0(base_dr,"/",i,"/",runFolder,"/"), pattern = '.csv', recursive = TRUE, full.names = TRUE)
 thres <- include(csv, "eval_metrics.csv")
@@ -259,7 +259,7 @@ n = n+1
 }
 df <- lapply(vector, read.csv)%>%
   bind_rows
-df <-df[-c(8),] 
+df <-df[-c(8),]
 write.csv(df, paste0(outputDir, "/median_summary_",Sys.Date() ,".csv"), row.names = FALSE, quote = FALSE)
 DT::datatable(df, options = list(pageLength = 25))
 
@@ -272,9 +272,9 @@ DT::datatable(df, options = list(pageLength = 25))
 <!-- ## Priority locations for further collecting -->
 <!-- This richness map shows the overlapping potential distributions of taxa - only where they have not yet been collected previously (i.e. not within 50 km of an existing germplasm accession point). High values are areas where many species might be found and have not yet been collected, and therefore may represent geographic targets for efficient collecting in the future -->
 
-  
+
 ```{r  echo=FALSE, message=FALSE, warning=FALSE}
-#define mask 
+#define mask
 
 # n= 1
 #   ### need to put is a clause incase
@@ -283,10 +283,10 @@ DT::datatable(df, options = list(pageLength = 25))
 # thres <- include(tif, "spdist_thrsld")
 # g50 <- include(tif, "ca50_g_narea_pa")
 # mask <- include(tif, "narea_mask")
-# 
+#
 # # gapRaster2 <- raster(include(tif, "grs_pa_PAs_narea_areakm2"))
 # # GRSin <- thres + gapRaster2
-# 
+#
 # if(length(thres) > 0){
 #   thres1 <- raster(thres) - raster(g50)
 #   thres1 <- crop(thres1, raster(mask))
@@ -299,7 +299,7 @@ DT::datatable(df, options = list(pageLength = 25))
 # n = n+1
 # }
 # }
-# 
+#
 # tmap_mode("view")
 # #Replace all zeros with NA
 # vector[vector == 0]<-NA
@@ -308,4 +308,3 @@ DT::datatable(df, options = list(pageLength = 25))
 
 
 ```
-

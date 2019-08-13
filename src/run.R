@@ -26,7 +26,7 @@ library(sp)
 library(plyr)
 
 # Load massive climate file
-base_dir = "//dapadfs"
+base_dir = ""
 repo_dir = "C:/Users/HSOTELO/Desktop/src"
 
 # Load the sources scripts
@@ -37,9 +37,9 @@ lapply(source.files, source)
 
 # Load massive climate file
 config(dirs=T)
-# 2.5 arc min 
+# 2.5 arc min
 # rst_vx <- readRDS(paste(par_dir,"/biolayer_2.5/climate_vx.RDS",sep=""))
-# 30 arc second 
+# 30 arc second
 rst_vx <- readRDS(paste(par_dir,"/bioLayer_1/predictorStack123.RDS",sep=""))
 
 load(file=paste0(par_dir, "/gadm/shapefile/gadm28ISO.RDS"))

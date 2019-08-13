@@ -1,15 +1,15 @@
 ###
-# script to produce the raw data for each species with iso country code. 
+# script to produce the raw data for each species with iso country code.
 ###
 library(dplyr)
 #library(countrycode)
 
-countryCodes <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/extras/allCountryCodes.csv")
-data <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/Cucurbita/Cucurbita_CWR_2019_5_29.csv")
+countryCodes <- read.csv("path to location of country code csv")
+data <- read.csv("path to species occurence data")
 
 dim(data)
 names(data)
-# generate  a list of all unique Taxon 
+# generate  a list of all unique Taxon
 CWR <- unique(data$Taxon_final)
 for(i in CWR){
   print(i)
@@ -52,28 +52,27 @@ join3 <- left_join(data, cC3, by= "country") %>%
 TrimCC <- bind_rows(joinFull,join2, join3)
 TrimCC$country <- TrimCC$iso3
 
-# select needed columns for the data, add native column for next aspect 
+# select needed columns for the data, add native column for next aspect
 rawFiles <- TrimCC %>%
   dplyr::select(c("Taxon_final","longitude", "latitude", "type", "country"))
 
-# setting write file directoy 
-local2 <- "C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/occurrences/raw/"
+# setting write file directoy
+local2 <- "base_dir + /parameters/occurrences/raw/"
 
-# read in dataset for testing the nativeness 
+# read in dataset for testing the nativeness
 #native <- read.table("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/WEP/cucurbitas_CWR_taxonKey.txt",
 #                     header = TRUE)
 
 
-# loop through the list of names and generate csv based on the species 
+# loop through the list of names and generate csv based on the species
 for(i in CWR){
   tbl <- filter(rawFiles, Taxon_final %in% i)
   tbl <- tbl[complete.cases(tbl),]
-  ###### again because these are filtered already we do not need to work about this for Daucus 
+  ###### again because these are filtered already we do not need to work about this for Daucus
   #  conList <- filter(native, Species %in% i) %>%
   #    dplyr::select(Native)
   #  tbl$native <- ifelse(tbl$country %in% unique(native$Native), "N", "I")
-  # print(c(as.character(conList[[1]]))) 
+  # print(c(as.character(conList[[1]])))
   write.csv(tbl,paste0(local2,as.character(i),".csv"))
   print(paste(i , nrow(tbl)))
-} 
-
+}

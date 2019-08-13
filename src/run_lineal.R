@@ -32,9 +32,9 @@ library(SamplingUtil)
 #install.packages("rJava")
 
 # Load massive climate file
-base_dir = "C:/Users/danie/Desktop/aichiTest/aichiTest"
-repo_dir = "C:/Users/danie/Desktop/aichiTest/aichiTest/src"
-temp_dir= "C:/Users/danie/Desktop/aichiTest/TEMP"
+base_dir = "enterPath"
+repo_dir = "base_dir + /src"
+temp_dir= "base_dir + /TEMP"
 if(!file.exists(temp_dir)){dir.create(temp_dir)}
 raster::rasterOptions(tmpdir=temp_dir)
 
@@ -56,7 +56,7 @@ for(i in 1:length(source.files)){
 }
 # Load massive climate file
 config(dirs=T)
-# 2.5 arc min 
+# 2.5 arc min
 rst_vx <- readRDS(paste(par_dir,"/bioLayer_2.5/climate_vx.RDS" ,sep=""))
 load(file=paste0(par_dir, "/gadm/shapefile/gadm28ISO.RDS"))
 config(dirs=F, cleaning=F, insitu=F, exsitu=F, modeling=T, premodeling=T)
@@ -66,21 +66,21 @@ config(dirs=F, cleaning=F, insitu=F, exsitu=F, modeling=T, premodeling=T)
 
 setwd(root)
 
-# running on local machine at the moment 
+# running on local machine at the moment
 server.number = "1"
-server.species = read.csv(paste0(root ,"/parameters/WEP/cucurbitas_CWR.csv"), header = TRUE) 
+server.species = read.csv(paste0(root ,"/parameters/WEP/ + youSpeciesOccuranceData.csv"), header = TRUE)
 
 ##########################################   End Set Parameters  ###############################################
 
-### view all potential species 
+### view all potential species
 # print(server.species)
 
 ### test selected species
 server.species2 <- slice(server.species,12)
-species1 <- "Cucurbita_pepo_subsp._fraterna"
+species1 <- "a species you are testing"
 ssCut <- server.species[12:16,]
 
-#run process for a selected species. 
+#run process for a selected species.
 result_master = lapply(server.species2, master_run)
 ##########################################   Start Process    ###############################################
 
