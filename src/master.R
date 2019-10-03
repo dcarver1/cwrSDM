@@ -27,6 +27,8 @@ master_run <- function(species) {
     #load config function
     #source(paste(repo_dir,"/config.R",sep=""))
 
+<<<<<<< HEAD
+=======
 
  t1a <- Sys.time()
     #create directories
@@ -64,16 +66,53 @@ master_run <- function(species) {
     final_function = "2.nat_area_sh was done"
     #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="nat_area_shp", runTime=difftime(Sys.time(), t1a, units='secs')))
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 
-    t1a <- Sys.time()
-    #step 2.3-crop bioclim
-    #source(paste(repo_dir,"/1_modeling/nat_area_mask.R",sep=""))
-    cat("...masking bioclim layers to native area\n")
-    crop_bio <- nat_area_mask(species)
-    final_function = "2.1.nat_area_mask was done"
-    #### Issue here is that the script is looking for species file based on the numerical id not the name.
+t1a <- Sys.time()
+   #create directories
+   #source(paste(repo_dir,"/tools/create_sp_dirs.R",sep=""))
+   cat("...creating directories\n")
+   spp_dirs <- create_sp_dirs(species)
+   final_function = "0.create_sp_dirs was done"
+   #calculate time
+   time_df <- rbind(time_df, data.frame(functionUsed="create_sp_dir",  runTime=difftime(Sys.time(), t1a, units='secs')))
+
+
+   t1a <- Sys.time()
+   #step 2.1-clean sea
+   #source(paste(repo_dir,"/0_cleaning/clean_sea.R",sep=""))
+   cat("...cleaning species\n")
+   spp_clean <- clean_sea(species)
+   final_function = "1.clean_sea was done"
+
+   #calculate time
+   time_df <- rbind(time_df, data.frame(functionUsed="clean_sea", runTime=difftime(Sys.time(), t1a, units='secs')))
+
+   t1a <- Sys.time()
+   #step 2.1.1-sampling ocurrences
+   spp_samp <- sampling(species)
+   final_function = "1.1.sampling ocurrences was done"
+   #calculate time
+   time_df <- rbind(time_df, data.frame(functionUsed="sampling", runTime=difftime(Sys.time(), t1a, units='secs')))
+
+
+   t1a <- Sys.time()
+   #step 2.2-create native area
+   #source(paste(repo_dir,"/1_modeling/nat_area_shp.R",sep=""))
+   cat("...creating native area shapefile\n")
+   narea_shp <- nat_area_shp(species)
+   final_function = "2.nat_area_sh was done"
+   #calculate time
+   time_df<- rbind(time_df, data.frame(functionUsed="nat_area_shp", runTime=difftime(Sys.time(), t1a, units='secs')))
+
+   t1a <- Sys.time()
+   #step 2.3-crop bioclim
+   #source(paste(repo_dir,"/1_modeling/nat_area_mask.R",sep=""))
+   cat("...masking bioclim layers to native area\n")
+   crop_bio <- nat_area_mask(species)
+   final_function = "2.1.nat_area_mask was done"
     #calculate time
-    time_df<- rbind(time_df, data.frame(functionUsed="nat_area_mask", runTime=difftime(Sys.time(), t1a, units='secs')))
+   time_df<- rbind(time_df, data.frame(functionUsed="nat_area_mask", runTime=difftime(Sys.time(), t1a, units='secs')))
 
     t1a <- Sys.time()
     #step 3-modeling (#only calibration)
@@ -88,7 +127,8 @@ master_run <- function(species) {
       final_function = "3.spModeling was done"
       #calculate time
       time_df<- rbind(time_df, data.frame(functionUsed="sModeling", runTime=difftime(Sys.time(), t1a, units='secs')))
-
+    
+    
     t1a <- Sys.time()
     #step 4.1-exsitu gap analysis
     #source(paste(repo_dir,"/2_gap_analysis/exsitu/srs.R",sep=""))
@@ -134,6 +174,16 @@ master_run <- function(species) {
     #calculate time
     time_df<- rbind(time_df, data.frame(functionUsed="ers_in", runTime=difftime(Sys.time(), t1a, units='secs')))
 
+<<<<<<< HEAD
+    
+    t1a <- Sys.time()
+    cat("...insitu srs\n")
+    srs_in <- srs_insitu(species)
+    #calculate time
+    time_df<- rbind(time_df, data.frame(functionUsed="srs_in", runTime=difftime(Sys.time(), t1a, units='secs')))
+    
+=======
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
     t1a <- Sys.time()
     #source(paste(repo_dir,"/2_gap_analysis/insitu/fcs.R",sep=""))
     cat("...insitu fcs\n")
@@ -168,6 +218,6 @@ master_run <- function(species) {
     status = FALSE
   }, finally = {
     print(paste0("End ",species))
-    return(data.frame(species = species, status = status, message = message, final_function = final_function))
+    #return(data.frame(species = species, status = status, message = message, final_function = final_function))
   })
 }

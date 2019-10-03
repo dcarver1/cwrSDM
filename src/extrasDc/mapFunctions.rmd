@@ -1,6 +1,11 @@
 ---
+<<<<<<< HEAD
+title: Summary of maxent modeling results and conservation gap analysis results per taxon 
+author: Daniel Carver and Colin Khoury 
+=======
 title: Summary of maxent modeling results and conservation gap analysis results per taxon
 author: Colin Khoury, Daniel Carver
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 output:
   html_document:
     code_folding: hide
@@ -20,9 +25,19 @@ output:
 library(knitr)
 library(markdown)
 library(rmarkdown)
+<<<<<<< HEAD
+library("tmap")
+library("raster")
+library("DT")
+#install.packages("redlistr")
+library(rgeos)
+library(rgdal)
+library(redlistr)
+=======
 library(tmap)
 library(raster)
 library(DT)
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```
 
 
@@ -33,11 +48,19 @@ include <- function (theList, toMatch){
                           theList, value=TRUE))
   return(matches)
 }
+<<<<<<< HEAD
+### var for testing Comment out before final save 
+# taxa <- "Capsicum_annuum_var._glabriusculum"
+#run<- "cucurbita20190531"
+#   base_dr <- "C:/Users/danie/Desktop/aichiTest/aichiTest/gap_analysis"
+# useCountry <- FALSE
+=======
 ### var for testing Comment out before final save
 # taxa <- "Daucus_gracilis"
 # run<- "daucus20190426"
 #  base_dr <- "base_dir + /gap_analysis"
 useCountry <- FALSE
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```
 
 ## Summary of the models for `r taxa`.
@@ -50,16 +73,17 @@ csv <- list.files(baseDir, pattern = ".csv", recursive = TRUE , full.names = TRU
 if (file.exists(paste0(base_dr, '/', taxa,'/counts.csv'))){
 counts <- as.data.frame(read.csv(paste0(base_dr, '/', taxa,'/counts.csv'))) %>%
   dplyr::select(c("totalRecords", "totalUseful", "totalGRecords", "totalGUseful","totalHRecords", "totalHUseful"))
+DT::datatable(counts)
 }else{
-  print("There are no samples present in Tunisia")
+  print("There were not enough data to produce a model")
 }
 
-if (file.exists(paste0(base_dr, '/', taxa,'/countsTunOnly.csv'))){
-countsTun <- as.data.frame(read.csv(paste0(base_dr, '/', taxa,'/countsTunOnly.csv'))) %>%
-  dplyr::select(c("totalRecords", "totalUseful", "totalGRecords", "totalGUseful","totalHRecords", "totalHUseful"))
-}else{
-  print("There are no samples present in Tunisia")
-}
+# if (file.exists(paste0(base_dr, '/', taxa,'/countsTunOnly.csv'))){
+# countsTun <- as.data.frame(read.csv(paste0(base_dr, '/', taxa,'/countsTunOnly.csv'))) %>%
+#   dplyr::select(c("totalRecords", "totalUseful", "totalGRecords", "totalGUseful","totalHRecords", "totalHUseful"))
+# }else{
+#   print("There were not enough data to produce a model")
+# }
 
 
 ```
@@ -69,14 +93,23 @@ countsTun <- as.data.frame(read.csv(paste0(base_dr, '/', taxa,'/countsTunOnly.cs
 
 ### Evaluation metrics
 
+<<<<<<< HEAD
+The modeling process was run with 10 replicates if there were more then 10 occurrences; three replicates if there were between three and 10 occurrences; and not run if < 3 occurrences. Running multiple models is done to account for random variation occuring in this type of modeling process. The table below shows the statistical results for the runs. 
+=======
 The modeling process was run with 10 replicates to attempt to account for random variation occuring in this type of process. The table below shows the statistical results for the 10 runs.
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
 # evalMetric <- include(csvs,"eval_metrics_rep.csv")
-DT::datatable(read.csv(include(csv,"eval_metrics_rep.csv")))
+
+evalStat<- read.csv(include(csv,"eval_metrics_rep.csv"))
+names(evalStat) <-c("Species","Replicate", "Training","Testing","Background + Training", "AUC","SDAUC",
+                                                 "Threshold","Sensitivity","Specificity","TSS","PCC")
+
+DT::datatable(evalStat)
 }
 ```
 <br>
@@ -84,14 +117,24 @@ DT::datatable(read.csv(include(csv,"eval_metrics_rep.csv")))
 <br>
 
 #### Median value
-The median result across the 10 replicates is shown below. Per previous articles we have done, to be considered an accurate and stable model, we are looking for an ATAUC >= 0.7; STAUC < 0.15; cAUC >= 0.4, and ASD15 <= 10
+The median result across the replicates is shown below. To be considered an accurate and stable model, AUC >= 0.7; SDAUC < 0.15; and ASD15 <= 10
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
 # evalMetric <- include(csvs,"eval_metrics_rep.csv")
-DT::datatable(read.csv(include(csv,"eval_metrics.csv")))
+
+  
+medianVal <- read.csv(include(csv,"eval_metrics.csv"))
+
+names(medianVal) <-c("Species", "Training","Testing","Background + Training", "AUC","SDAUC",
+                      "ASD15", "Threshold","Sensitivity","Specificity",
+                     "TSS","PCC","nAUC","cAUC","VALID")
+
+
+DT::datatable(medianVal)
+
 }
 ```
 <br>
@@ -101,7 +144,7 @@ DT::datatable(read.csv(include(csv,"eval_metrics.csv")))
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
   tif <- list.files(path = baseDir, pattern = '.tif', recursive = TRUE, full.names = TRUE)
 if(useCountry == TRUE){
@@ -139,7 +182,7 @@ sd2 <- raster(include(tif, "spdist_sd"))
 Map of the median result from maxent models. Values in the key refer to probability of occurrence.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
     occList <- read.csv(list.files(path = occ_dir,pattern = paste0(taxa,".csv"),full.names = TRUE), header = TRUE)
     spAll = sp::SpatialPointsDataFrame(occList[,c("longitude", "latitude")], data = occList)
@@ -176,7 +219,7 @@ tm_shape(median2) + tm_raster()+
 Map of the standard deviation result from maxent models
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
 qtm(shp = sd2)
 }
@@ -201,7 +244,7 @@ Map of the threshold (binary presence-absence) result from maxent models. This i
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
 palette1 <- c(  "#FFFFFF","#45B320")
 tm_shape(thrshold2) + tm_raster(palette=palette1)+
@@ -227,18 +270,106 @@ Map of the threshold (binary presence-absence) result from maxent models.
 
 ### Conservation gap analysis
 
+<!-- #### Redlist components? -->
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# wgs84 <- crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+# worldEqualArea <- crs("+proj=cea +lon_0=0 +lat_ts=0 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs ")
+# crs(spAll) <- crs(wgs84)
+# spAllPro <- spTransform(spAll, crs(worldEqualArea))
+# EOO.polygon <- makeEOO(spAllPro)
+# 
+# # then calcualte the area of the bounding box
+# EOO.area <- getAreaEOO(EOO.polygon)
+# #determine status based on area
+#  if (EOO.area >= 45000) {blo <- "Least Concern (LC)"}
+#  if (EOO.area < 45000) {blo <- "Possible Near Threatened (NT)"}
+#  if (EOO.area < 20000) {blo <- "Vulnerable (VU)"} # 20000
+#  if (EOO.area < 5000) {blo <- "Endangered (EN)"} # 5000
+#  if (EOO.area < 100) {blo <- "Critically Endangered (CR)"} # 100
+#  if (EOO.area == "NA") {blo <- "Critically Endangered (CR)"}
+# 
+# #EOO.area
+# # this value is then use in the develop of other criteria in the sebcriterion B1
+# 
+# ### Subcriterion B2 (calculating AOO)
+# # create a 10 x 10 grid of to overlay on distribution.
+# 
+# AOO.grid <- makeAOOGrid(spAllPro, grid.size = 10000,
+#                         min.percent.rule = F)
+# #plot(AOO.grid)
+# n.AOO <- length(AOO.grid)
+# AOOarea <- n.AOO* 100
+#   if (AOOarea >= 4500) {AOO_cat <- "Least Concern (LC)"} # <
+#   if (AOOarea < 4500) {AOO_cat <- "Possible Near Threatened (NT)"}
+#   if (AOOarea < 2000) {AOO_cat <- "Vulnerable (VU)"} # < 2000
+#   if (AOOarea < 500) {AOO_cat <- "Endangered (EN)"}# < 500
+#   if (AOOarea < 10) {AOO_cat  <- "Critically Endangered (CR)"}# < 10
+#   if (AOOarea == "NA") {AOO_cat <- "Critically Endangered (CR)"}
+# 
+# 
+# #n.AOO
+# # so the length is just the number of grid cells that overlay this environment
+# # because the position of the grid cells can potential change the number of cells
+# # a randomized process is used to determine a minimun number of grids.
+# 
+# gU.results <- gridUncertainty(spAllPro, 10000,
+#                               n.AOO.improvement = 5,
+#                               min.percent.rule = F)
+# #plot(gU.results$min.AOO.grid$out.grid)
+# # If it takes your computer very long to run this command, consider reducing
+# # n.AOO.improvement
+# #gU.results$min.AOO.df
+# 
+# # these result show that the true minimun value is actually 10. Pull that value
+# # with the following line
+# 
+# #gU.results$min.AOO.grid$AOO.number
+# 
+# # the grid size is not a set value but can change depending on the species
+# # other parameters may be alter as well, such as the require proportion of the grid filled
+# # in order to be counted.
+# 
+# ### we can apply this because were using points not an area. So precent does not apply
+# # AOO.grid.one.percent <- makeAOOGrid(spAllPro, grid.size = 10000,
+# #                                     min.percent.rule = T, percent = 1)
+# #
+# # AOO.grid.min.percent <- makeAOOGrid(spAllPro, grid.size = 10000,
+# #                                     min.percent.rule = T, percent = 0.1)
+# 
+# df <- data.frame(matrix(data = NA, nrow = 1, ncol = 6))
+# colnames(df) <- c("taxon", "EOO Area km2","EOO Status", "AOO", "AOO adjusted Minimum", "AOO Status")
+# 
+# df$taxon <- taxa
+# df$`EOO Area km2` <- EOO.area
+# df$`EOO Status`<- blo
+# df$AOO <- n.AOO * 100
+# df$`AOO adjusted Minimum` <- gU.results$min.AOO.grid$AOO.number * 100
+# df$`AOO Status` <- AOO_cat
+# 
+# #still run them with the html but do not display in docs
+# # DT::datatable(df)
+# write.csv(x = df, file = paste0(baseDir, '/',taxa,'listingValues.csv'))
+```
+
 
 #### Ex situ Conservation
 
+<<<<<<< HEAD
+The table below shows the ex situ conservation summary. SRSex is a gross comparison of germplasm (G) and reference (H) records. GRSex analyzes how comprehensively the G records cover the maxent model spatially. ERSex analyzes how well the G records cover the maxent model with regard to ecosystems covered. 
+All of the conservation metrics are on a scale from 0-100, with 0 = poor conservation and 100 = perfectly sufficient conservation. The final ex situ conservation score is called FCSex and is a mean of the three ex situ conservation scores.
+=======
 The table below shows the ex situ conservation summary. SRS is a gross comparison of germplasm (G) and reference (H) records. GRS analyzes how comprehensively the G records cover the maxent model spatially. ERS analyzes how well the G records cover the maxent model with regard to ecosystems covered.
 All of the conservation metrics are on a scale from 0-100, with 0 = poor conservation and 100 = perfectly sufficient conservation. The final ex situ conservation score is called FCS and is a mean of the 3 ex situ conservation scores.
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # exSummary <- include(csv, "exsitu/summary.csv")
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("There are no G points present so this process could not be completed.")
 }else{
 tableEx <- dplyr::bind_cols(counts, read.csv(include(csv, "exsitu/summary.csv")))
 tableEx <- tableEx[c(7,1,2,3,4,5,6,8,9,10, 11)]
+names(tableEx) <- c("ID","totalRecords","totalUseful","totalGRecords", 
+                    "totalGUseful","totalHRecords","totalHUseful","SRS_ex", "GRS_ex","ERS_ex","FCS_ex")
 DT::datatable(tableEx)
 }
 ```
@@ -249,12 +380,23 @@ DT::datatable(tableEx)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("There are no G points present so this process could not be completed.")
 }else{
   # pull in all g points.
   #No idea why this is not working, going back to old indexing
   # %>%   filter(type == "G")
   occList <- occList[which(occList$type == "G"),]
+<<<<<<< HEAD
+  if(nrow(occList) != 0){
+      sp = sp::SpatialPoints(occList[,c("longitude", "latitude")])
+      gapRaster <- raster(include(tif, "ca50_g_narea_pa"))
+      collgap1 <- thrshold + gapRaster
+  }else{
+print("There are no G points present so this process could not be completed.")
+  } 
+}
+      
+=======
 
   sp = sp::SpatialPoints(occList[,c("longitude", "latitude")])
 gapRaster <- raster(include(tif, "ca50_g_narea_pa"))
@@ -263,6 +405,7 @@ gapRaster2a <- gapRaster2[is.na(gapRaster2)] <- 0
 collgap1 <- thrshold + gapRaster
 GRSin <- thrshold + gapRaster2
 }
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```
 
 #### GRSex
@@ -276,9 +419,11 @@ Area Where samples have been collected = 2
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("There are no G points present so this process could not be completed.")
 }else{
-  gPoint <- spAll[spAll@data$type == "G",]
+  if(nrow(occList) == 0){
+  print("There are no G points present so this process could not be completed.")
+  }else{ gPoint <- spAll[spAll@data$type == "G",]
   palette1 <- c(  "#FFFFFF","#45B320","#7570b3")
   if(length(gPoint$X)>0){
 tm_shape(collgap1) + tm_raster(palette=palette1)+
@@ -290,6 +435,9 @@ tm_shape(collgap1) + tm_raster(palette=palette2)+
     tm_scale_bar()
 }
 }
+<<<<<<< HEAD
+}
+=======
 #
 # tm_shape(Europe) +
 # tm_fill("gdp_cap_est", title = "GDP", style = "fixed",
@@ -307,6 +455,7 @@ tm_shape(collgap1) + tm_raster(palette=palette2)+
 #           legend.bg.alpha = 1)
 #
 
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```
 
 <br>
@@ -317,15 +466,23 @@ tm_shape(collgap1) + tm_raster(palette=palette2)+
 
 #### In Situ Conservation
 
+<<<<<<< HEAD
+The table below shows the in situ conservation summary.  SRSin reports the proportion of occurrences which fall within protected areas (WDPA database 2019). GRSin analyzes how comprehensively protected areas cover the maxent model spatially. ERSin analyzes how well protected areas cover the maxent model with regard to ecosystems covered. 
+All of the conservation metrics are on a scale from 0-100, with 0 = poor conservation and 100 = perfectly sufficient conservation. The final in situ conservation score is called FCSin and is a mean of the three in situ conservation scores.
+=======
 The table below shows the in situ conservation summary.  GRS analyzes how comprehensively protected areas (WDPA database 2019) cover the maxent model spatially. ERS analyzes how well protected areas cover the maxent model with regard to ecosystems covered.
 All of the conservation metrics are on a scale from 0-100, with 0 = poor conservation and 100 = perfectly sufficient conservation. The final in situ conservation score is called FCS and is a mean of the 2 in situ conservation scores.
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # inSummary <- include(csv, "insitu/summary.csv")
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
 tableIn <- dplyr::bind_cols(counts, read.csv(include(csv, "insitu/summary.csv")))
-tableIn <- tableIn[c(7,1,2,3,4,5,6,8,9,10)]
+tableIn <- tableIn[c(7,1,2,3,4,5,6,8,9,10,11)]
+names(tableIn) <- c("ID","totalRecords","totalUseful","totalGRecords",
+                    "totalGUseful","totalHRecords","totalHUseful","SRS_in",
+                    "GRS_in","ERS_in","FCS_in")
 DT::datatable(tableIn)
 }
 ```
@@ -345,11 +502,23 @@ Protected Lands within the Potential Distribution = 2
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){
-  print("Models were not are to be ran on this species due to insufficent number of samples")
+  print("Models were not able to be ran on this species due to insufficent number of samples")
 }else{
+<<<<<<< HEAD
+gapRaster2 <- raster(include(tif, "grs_pa_PAs_narea_areakm2"))
+      gapRaster2a <- gapRaster2[is.na(gapRaster2)] <- 0
+      if(file.exists(include(tif, "spdist_thrsld"))){
+        GRSin <- thrshold + gapRaster2
+        palette3 <- c(  "#FFFFFF","#45B320","#7570b3")
+    tm_shape(GRSin) + tm_raster(palette = palette3)+
+=======
 
 tm_shape(GRSin) + tm_raster(palette = palette1)+
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
     tm_scale_bar()
+      }else{
+        print("Models were not able to be ran on this species due to insufficent number of samples")
+      }
 }
 
 ```
@@ -357,8 +526,13 @@ tm_shape(GRSin) + tm_raster(palette = palette1)+
 <br>
 <br>
 
+<<<<<<< HEAD
+#### Combined Summary 
+This table shows the combined ex situ and in situ conservation metrics. FCSc-mean is the final combined conservation score. We categorize taxa based on the final combined scores (0-25 = high priority (HP) for further conservation work; 25-50 medium (MP); 50-75 low (LP); and 75-100 sufficiently conserved (SC)
+=======
 #### Combined Summary
 This table shows the combined ex situ and in situ conservation metrics. FCSCmean is the final conservation score we have been using. We also categorize these scores (0-25 = high priority (HP) for further conservation work; 25-50 medium (MP); 50-75 low (LP); and 75-100 sufficiently conserved (SC)
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # inSummary <- include(csv, "insitu/summary.csv")
 if(length(include(csv,"eval_metrics_rep.csv")) == 0){

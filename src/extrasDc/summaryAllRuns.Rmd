@@ -1,6 +1,11 @@
 ---
+<<<<<<< HEAD
+title: Summary of maxent modeling results and conservation gap analysis results across taxa 
+author: Daniel Carver and Colin Khoury 
+=======
 title: Summary of maxent modeling results and conservation gap analysis results per taxon
 author: Colin Khoury, Daniel Carver
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 output:
   html_document:
     code_folding: hide
@@ -31,15 +36,37 @@ include <- function (theList, toMatch){
                           theList, value=TRUE))
   return(matches)
 }
-## var for testing Comment out before final save
 ```
 
 
+<<<<<<< HEAD
+## Species Richness Map 
+This map combines all threshold maps for all taxa. Darker colors denotes more taxa potentially inhabiting the same locations 
+=======
 ## Species Richness Map
 This map combines all threshold maps for individual species.
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 
 
 ```{r  echo=FALSE, message=FALSE, warning=FALSE}
+# function to change the extent of all rasters
+extend_all =function(rasters){
+ extent(Reduce(extend,rasters))
+}
+# function to places all na values with zeros 
+removeNA = function(rasterPath){
+  r1 <- raster::raster(rasterPath)
+  r1[is.na(r1)] <- 0
+  return(r1)
+}
+# function for 
+sum_all = function(rasters, extent){
+ re = lapply(rasters, function(r){extend(r, extent, value=0)})
+ Reduce("+",re)
+} 
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 n= 1
 speciesList <- species
 vector <- c("feature")
@@ -53,15 +80,11 @@ n = n+1
 }
 }
 
-removeNA = function(rasterPath){
-  r1 <- raster::raster(rasterPath)
-  r1[is.na(r1)] <- 0
-  return(r1)
-}
-
 
 rasterList <- lapply(X = vector, FUN = removeNA)
 
+<<<<<<< HEAD
+=======
 
 extend_all =function(rasters){
  extent(Reduce(extend,rasters))
@@ -72,12 +95,16 @@ function(rasters, extent){
  re = lapply(rasters, function(r){extend(r, extent, value=0)})
  Reduce("+",re)
 }
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 r_sum = sum_all(rasterList, extend_all(rasterList))
+
 tmap_mode("view")
 #Replace all zeros with NA
 r_sum[r_sum == 0]<-NA
 qtm(r_sum)
 raster::writeRaster(x = r_sum, filename = paste0(outputDir , '/speciesRichness'), format = "GTiff",overwrite=TRUE)
+<<<<<<< HEAD
+=======
 
 ### insitu conservation map.
 # protectAreas <- raster("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/protected_areas/raster/wdpa_reclass.tif")
@@ -94,49 +121,122 @@ raster::writeRaster(x = r_sum, filename = paste0(outputDir , '/speciesRichness')
 #
 # raster::writeRaster(x = paOutTunisia, filename = paste0(outputDir, "/insituGapAreas"), format = "GTiff", overwrite=TRUE)
 
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 ```
-<br>
-<br>
-Tunisia Only
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+### Exsitu Conservation Map 
 
-## Species Richness in Tunisia
 
-if(useCountry == T){
-tunisia <- mask(r_sum, country)
-mask <- country
-qtm(tunisia)
+### Exsitu conservation map
+# sum all g buffer maps that have been clipped to model area 
+# subtract final form the species richness map 
+
+n= 1
+speciesList <- species
+vector <- c("feature")
+  ### need to put is a clause incase 
+for(i in speciesList){
+tif <- list.files(path = paste0(base_dr,"/",i,"/",runFolder,"/"), pattern = '.tif', recursive = TRUE, full.names = TRUE)
+thres <- include(tif, "ca50_g_narea_pa")
+if(length(thres) > 0){
+vector[n] <- thres
+n = n+1
 }
+}
+
+rasterList <- lapply(X = vector, FUN = removeNA)
+
+setTo1 = function(raster){
+  raster[raster > 0]<-1
+}
+
+r_sumEx = sum_all(rasterList, extend_all(rasterList))
+
+tmap_mode("view")
+#Replace all zeros with NA 
+
+exsituGap <- r_sum - r_sumEx
+#qtm(exsituGap)
+raster::writeRaster(x = exsituGap, filename = paste0(outputDir , '/exSituGaps'), format = "GTiff",overwrite=TRUE)
+
+
+r_sumEx[r_sumEx == 0]<-NA
+#qtm(r_sumEx)
+
+
+raster::writeRaster(x = r_sumEx, filename = paste0(outputDir , '/exSituConservation'), format = "GTiff",overwrite=TRUE)
 ```
+
+
+
+```{r  echo=FALSE, message=FALSE, warning=FALSE}
+### Insitu Conservation Map 
+
+
+### insitu conservation map. 
+protectAreas <- raster("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/protected_areas/raster/wdpa_reclass.tif")
+
+#unique(values(protectAreas))
+#flipping these values so when I mutple by r_sum raster areas within protected areas appear as zero.
+protectAreas[protectAreas == 1]<- 0
+
+protectAreas[is.na(protectAreas)]<- 1
+# multiply reduces all the values within protected area to 0
+paOut <- protectAreas * r_sum
+#paOutTunisia <- mask(paOut, country)
+#qtm(paOutTunisia)
+#qtm(paOut)
+raster::writeRaster(x = paOut, filename = paste0(outputDir, "/insituGapAreas"), format = "GTiff", overwrite=TRUE)
+```
+
 <br>
 <br>
-<br>
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# 
+# ## Species Richness in Tunisia
+# 
+# if(useCountry == T){
+# tunisia <- mask(r_sum, country)
+# mask <- country
+# qtm(tunisia)
+# }
+```
 
 ## Summary of Conservation Statistics for all Species
 
-The SRS conservation statistic is based on all known occurance records for the species (Total_records). The other conservation metrics are based on the expert evaluated dataset that was used in the modeling process (Records_Used_in_Model).   
 
 
 ```{r  echo=FALSE, message=FALSE, warning=FALSE}
 
+<<<<<<< HEAD
+# modelingData <- read.csv("C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/Cucurbita/allSpecies_new2019_5_9_allrecords_cleaned.csv")
+=======
 modelingData <- read.csv("path to location of modeling data")
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 # species <- speciesList[1]
 
 species_summary <- function(species){
 
   count_dir <- paste0(base_dr,"/",species)
   gap_dir <- paste0(base_dr,"/",species,"/",runFolder,"/gap_analysis")
+<<<<<<< HEAD
+  
+  # numberUsedInModel <- modelingData %>%
+  #   filter(Taxon_final == species)%>%
+  #   nrow()
+  
+=======
 
   numberUsedInModel <- modelingData %>%
     filter(Taxon_final == species)%>%
     nrow()
 
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
   colsNames <- c( "Scientific_Name", "Total_records",
                             "Total_with_coords", "Total_G", "Total_G_with_coords", "Total_H", "Total_H_with_coords",
-                    "Total_records_Tunisia","Total_with_coords_Tunisia", "Total_G_Tunisia",
-  "Total_G_with_coords_Tunisia","Total_H_Tunisia", "Total_H_with_coords_Tunisia",
-"SRS", "GRS_ex", "ERS_ex", "FCS_ex", "GRS_in", "ERS_in", "FCS_in", "FCSc_min",
+"SRS_ex", "GRS_ex", "ERS_ex", "FCS_ex", "SRS_in", "GRS_in", "ERS_in", "FCS_in", "FCSc_min",
                             "FCSc_max", "FCSc_mean", "Priority_category")
 
   summ_table <- as.data.frame(matrix(ncol = length(colsNames), nrow = 1))
@@ -166,24 +266,24 @@ species_summary <- function(species){
     summ_table$Total_H_with_coords <- NA
     #summ_table$Records_Used_in_Model <- NA
   }
-    if(file.exists(paste0(count_dir, "/countsTunOnly.csv"))){
-    counts <- read.csv(paste0(count_dir, "/countsTunOnly.csv"), header = TRUE)
-    summ_table$Total_records_Tunisia <- counts$totalRecords
-    summ_table$Total_with_coords_Tunisia <- counts$totalUseful
-    summ_table$Total_G_Tunisia <- counts$totalGRecords
-    summ_table$Total_G_with_coords_Tunisia <- counts$totalGUseful
-    summ_table$Total_H_Tunisia <- counts$totalHRecords
-    summ_table$Total_H_with_coords_Tunisia <- counts$totalHUseful
-
-  }else{
-    summ_table$Total_records_Tunisia <- NA
-    summ_table$Total_with_coords_Tunisia <- NA
-    summ_table$Total_G_Tunisia <- NA
-    summ_table$Total_G_with_coords_Tunisia <- NA
-    summ_table$Total_H_Tunisia <- NA
-    summ_table$Total_H_with_coords_Tunisia <- NA
-
-  }
+  #   if(file.exists(paste0(count_dir, "/countsTunOnly.csv"))){
+  #   counts <- read.csv(paste0(count_dir, "/countsTunOnly.csv"), header = TRUE)
+  #   summ_table$Total_records_Tunisia <- counts$totalRecords
+  #   summ_table$Total_with_coords_Tunisia <- counts$totalUseful
+  #   summ_table$Total_G_Tunisia <- counts$totalGRecords
+  #   summ_table$Total_G_with_coords_Tunisia <- counts$totalGUseful
+  #   summ_table$Total_H_Tunisia <- counts$totalHRecords
+  #   summ_table$Total_H_with_coords_Tunisia <- counts$totalHUseful
+  # 
+  # }else{
+  #   summ_table$Total_records_Tunisia <- NA
+  #   summ_table$Total_with_coords_Tunisia <- NA
+  #   summ_table$Total_G_Tunisia <- NA
+  #   summ_table$Total_G_with_coords_Tunisia <- NA
+  #   summ_table$Total_H_Tunisia <- NA
+  #   summ_table$Total_H_with_coords_Tunisia <- NA
+  # 
+  # }
   # if (is.na(pri2$VALID[which(pri2$Species==species)])){
   #   summ_table$Model_type <- "NA"
   # } else if(pri2$VALID[which(pri2$Species==species)]){
@@ -195,7 +295,7 @@ species_summary <- function(species){
 
   if(file.exists(paste0(gap_dir,"/exsitu/summary.csv"))){
     exsitu <- read.csv(paste0(gap_dir,"/exsitu/summary.csv"), header = TRUE)
-    summ_table$SRS <- round(exsitu$SRS, 2)
+    summ_table$SRS_ex <- round(exsitu$SRS, 2)
     summ_table$GRS_ex <- round(exsitu$GRS, 2)
     summ_table$ERS_ex <- round(exsitu$ERS, 2)
     summ_table$FCS_ex <- round(exsitu$FCS, 2)
@@ -203,6 +303,7 @@ species_summary <- function(species){
 
   if(file.exists(paste0(gap_dir,"/insitu/summary.csv"))){
     insitu <- read.csv(paste0(gap_dir,"/insitu/summary.csv"), header = TRUE)
+    summ_table$SRS_in <- round(insitu$SRS, 2)
     summ_table$GRS_in <- round(insitu$GRS, 2)
     summ_table$ERS_in <- round(insitu$ERS, 2)
     summ_table$FCS_in <- round(insitu$FCS, 2)
@@ -241,8 +342,13 @@ DT::datatable(species_table, options = list(pageLength = 25))
 <br>
 
 
+<<<<<<< HEAD
+## Median Model Runs 
+Evaluation statistics for the median model runs for all taxa with enough occurrence points to be modeled. 
+=======
 ## Median Model Runs
 Evaluation statistics for the median model run for species that enough occurence points to be modeled.
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 
 ```{r  echo=FALSE, message=FALSE, warning=FALSE}
 n= 1
@@ -259,7 +365,17 @@ n = n+1
 }
 df <- lapply(vector, read.csv)%>%
   bind_rows
+<<<<<<< HEAD
+#df <-df[-c(8),] 
+names(df) <-c("Species","Training","Testing","Background + Training", "AUC","SDAUC","ASD15",
+                                                 "Threshold","Sensitivity","Specificity","TSS","PCC",
+                                                 "nAUC","cAUC","VALID")
+# df <- dplyr::select(df, -c(cAUC))
+
+
+=======
 df <-df[-c(8),]
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
 write.csv(df, paste0(outputDir, "/median_summary_",Sys.Date() ,".csv"), row.names = FALSE, quote = FALSE)
 DT::datatable(df, options = list(pageLength = 25))
 
@@ -268,6 +384,36 @@ DT::datatable(df, options = list(pageLength = 25))
 <br>
 <br>
 <br>
+
+### Summary of EOO and AOO Red Listing Parameters 
+These threat status values quantify the geographic extent of the taxa based on the known occurrence locations. 
+
+```{r  echo=FALSE, message=FALSE, warning=FALSE}
+n= 1
+speciesList <- species
+vector <- c("feature")
+  ### need to put is a clause incase 
+for(i in speciesList){
+csv <- list.files(path = paste0(base_dr,"/",i,"/",runFolder,"/"), pattern = '.csv', recursive = TRUE, full.names = TRUE)
+redList <- include(csv, "listingValues.csv")
+if(length(redList) > 0){
+vector[n] <- redList
+n = n+1
+}
+}
+
+df <- lapply(vector, read.csv)%>%
+  bind_rows 
+round <- lapply(df$EOO.Area.km2, function(x){
+  round(x,0)
+})
+df$EOO.Area.km2 <- unlist(round)
+df <- df[,-1]
+colnames(df) <- c("Species", "EOO Area km2","EOO Status", "AOO", "AOO adjusted Minimum", "AOO Status")
+write.csv(df, paste0(outputDir, "/listing_summary_",Sys.Date() ,".csv"), row.names = FALSE)
+DT::datatable(df, options = list(pageLength = 25))
+```
+
 
 <!-- ## Priority locations for further collecting -->
 <!-- This richness map shows the overlapping potential distributions of taxa - only where they have not yet been collected previously (i.e. not within 50 km of an existing germplasm accession point). High values are areas where many species might be found and have not yet been collected, and therefore may represent geographic targets for efficient collecting in the future -->
@@ -308,3 +454,49 @@ DT::datatable(df, options = list(pageLength = 25))
 
 
 ```
+<<<<<<< HEAD
+
+
+
+```{r  echo=FALSE, message=FALSE, warning=FALSE}
+# compile all the modeled Bio Data
+n= 1
+speciesList <- species
+vector <- c("feature")
+  ### need to put is a clause incase
+for(i in speciesList){
+csv <- list.files(path = paste0(base_dr,"/",i,"/",runFolder,"/"), pattern = '.csv', recursive = TRUE, full.names = TRUE)
+bioValues <- include(csv, "modeledPresencesWithBioClimValues.csv")
+if(length(bioValues) > 0){
+vector[n] <- bioValues
+n = n+1
+}
+}
+
+df <- lapply(vector, read.csv)%>%
+  bind_rows
+colnames(df) <- names(read.csv(bioValues))
+write.csv(df, paste0(outputDir, "/modeledBioValues_",Sys.Date() ,".csv"), row.names = FALSE)
+```
+
+```{r  echo=FALSE, message=FALSE, warning=FALSE}
+# compile all the variable selection options
+n= 1
+speciesList <- species
+vector <- c("feature")
+  ### need to put is a clause incase
+for(i in speciesList){
+csv <- list.files(path = paste0(base_dr,"/",i,"/",runFolder,"/"), pattern = '.csv', recursive = TRUE, full.names = TRUE)
+selectVar <- include(csv, "varibleImportanceModeled.csv")
+if(length(selectVar) > 0){
+vector[n] <- selectVar
+n = n+1
+}
+}
+
+df <- lapply(vector, read.csv)%>%
+  bind_rows
+write.csv(df, paste0(outputDir, "/variablesModeled_",Sys.Date() ,".csv"), row.names = FALSE)
+```
+=======
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3

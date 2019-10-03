@@ -55,22 +55,21 @@ calculate_fcs = function(species){
     #print(paste0("Start ",species))
   
     # Read results of insitu analysis
-    grs.path = paste0(species.dir, "gap_analysis/insitu/grs_result.csv")
-    ers.path = paste0(species.dir, "gap_analysis/insitu/ers_result.csv")
-    
-    grs = read.csv(grs.path,header = T, sep=",")
-    ers = read.csv(ers.path,header = T, sep=",")
+    grs = read.csv(paste0(species.dir, "gap_analysis/insitu/grs_result.csv"),header = T, sep=",")
+    ers = read.csv(paste0(species.dir, "gap_analysis/insitu/ers_result.csv"),header = T, sep=",")
+    srs = read.csv(paste0(species.dir, "gap_analysis/insitu/srs_result.csv"),header = T, sep=",")
     
     #print("Loaded files")
     
     grs.value = grs$GRS
     ers.value = ers$ERS
-    fcs.value = (grs.value + ers.value)/2
+    srs.value = srs$SRS
+    fcs.value = (grs.value + ers.value + srs.value)/3
     
     #print("Calculated FCS")
     
     # Join the results
-    df <- data.frame(ID = species, GRS = grs.value, ERS = ers.value, FCS = fcs.value)
+    df <- data.frame(ID = species, SRS=srs.value, GRS = grs.value, ERS = ers.value, FCS = fcs.value)
     
     # Save the results
     save_results_fcs(df,species.dir)

@@ -67,6 +67,3 @@ fcs_combine <- function(species) {
   return(data_comb)
 }
 
-#testing function
-#base_dir <- "~/nfs"
-#fcsc <- fcs_combine("2686262")

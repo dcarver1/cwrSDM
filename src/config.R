@@ -14,7 +14,11 @@
 
 config <- function(dirs=T, cleaning=F, insitu=F, exsitu=F, modeling=F, premodeling=F, Country=F) {
   #version
+<<<<<<< HEAD
+  run_version <<- "capsicum20190701"
+=======
   run_version <<- "nameOfTheversion"
+>>>>>>> 22453825f4f42a2cdd6be82bce2f3f20e2abedc3
   Country <<- FALSE
   #countryOfInterset <<- "TUN"  #needs to be ISO3
   #folder1 <<- "C:/Users/danie/Desktop/aichiTest/aichiTest/parameters/gadm/shapefile"

@@ -125,12 +125,12 @@ metrics_function<-function(species){
   return(evaluate_table)
 }
 
-evaluate_function <- function(species, evaluate_table){
-  
+evaluate_function <- function(species){
   crossValDir <- paste0(gap_dir, "/", species, "/", run_version, "/modeling/maxent")
+  evaluate_table <- read.csv(paste0(crossValDir,"/","eval_metrics_rep.csv"))
   evaluate_table_f<-as.data.frame(matrix(nrow = 1,ncol=15))
-  colnames(evaluate_table_f)<-c("species","training","testing","Background","ATAUC","STAUC",
-                              "Threshold","Sensitivity","Specificity","TSS","PCC","nAUC","cAUC","ASD15","VALID")
+  colnames(evaluate_table_f)<-c("species","training","testing","Background","ATAUC","STAUC","ASD15",
+                              "Threshold","Sensitivity","Specificity","TSS","PCC","nAUC","cAUC","VALID")
   
   ###ASD15
   esdCpt <- raster(paste0(crossValDir, "/spdist_sd.tif"))
@@ -204,8 +204,8 @@ evaluate_function <- function(species, evaluate_table){
   
   if (evaluate_table_f[,"ATAUC"]>=0.7 &
      evaluate_table_f[,"STAUC"]<0.15 &
-     evaluate_table_f[,"ASD15"]<=10 &
-     evaluate_table_f[,"cAUC"]>=0.4
+     evaluate_table_f[,"ASD15"]<=10 #&
+     #evaluate_table_f[,"cAUC"]>=0.4
   ) {
     evaluate_table_f[,"VALID"]  <-TRUE 
   } else {
